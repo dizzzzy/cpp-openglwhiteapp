@@ -50,6 +50,13 @@ glm::vec3 translateMod = glm::vec3(0, 0, 0);
 glm::vec3 scaleMod = glm::vec3(1, 1, 1);
 glm::vec3 rotateMod = glm::vec3(0, 0, 0);
 
+//---------HORSE BODY PART DIMENSIONS---------
+glm::vec3 leg = glm::vec3(1.5, 0.5, 0.5);  //really half a leg
+glm::vec3 body = glm::vec3(5, 2, 2);
+
+//-------HORSE BODY PART POSITIONS----------
+
+
 
 GLuint loadShaders(std::string vertex_shader_path, std::string fragment_shader_path) {
 
@@ -512,90 +519,112 @@ void drawGrid(GLuint gridVAO){
 	glBindVertexArray(0);
 }
 
-void drawBody(GLuint cubeVAO){
+void drawBody(GLuint cubeVAO){  //torso
+	glm::vec3 body_pos = glm::vec3(0, body.y / 2 + leg.x * 2, 0) * scaleMod.x;
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3( 5, 2, 2)); // 5 2 2
-	translate = glm::translate(glm::mat4(1.0f), glm::vec3(0, 4, 0));
+	translate = glm::translate(glm::mat4(1.0f), body_pos);
+	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(0, 4, 0));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.f), glm::vec3(0, 0, 1));
 	glUniform1i(fillLoc, 0);
 	drawCube(cubeVAO);
 }
 
 void drawNeck(GLuint cubeVAO){
+	glm::vec3 neck_pos = glm::vec3(-0.55* body.x, 1.125*(body.y / 2 + leg.x * 2), 0) * scaleMod.x;
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(2, 1.25, 1.25));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(-45.0f), glm::vec3(0, 0, 1));
-	translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.75, 4.5, 0));
+	translate = glm::translate(glm::mat4(1.0f), neck_pos);
+	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.75, 4.5, 0));
 	glUniform1i(fillLoc, 5);
 	drawCube(cubeVAO);
 }
 
 void drawHead(GLuint cubeVAO){
+	glm::vec3 head_pos = glm::vec3(-0.75* body.x, 1.25*(body.y / 2 + leg.x * 2), 0) * scaleMod.x;
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(2, 1.25, 1.25));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0, 0, 1));
-	translate = glm::translate(glm::mat4(1.0f), glm::vec3(-3.75, 5, 0));
+	translate = glm::translate(glm::mat4(1.0f), head_pos);
+	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(-3.75, 5, 0));
 	glUniform1i(fillLoc, 6);
 	drawCube(cubeVAO);
 }
 
 void drawFrontLeftUpperLeg(GLuint cubeVAO){
+	glm::vec3 leg_pos = glm::vec3(-0.5*(body.x - leg.y), 1.5*leg.x , 0.5*body.z - 0.5*leg.z) * scaleMod.x;
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5, 0.5, 0.5));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0, 0, 1));
-	translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.25, 2.25, 0.75));
+	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.25, 2.25, 0.75));
+	translate = glm::translate(glm::mat4(1.0f), glm::vec3(leg_pos));
 	glUniform1i(fillLoc, 5);
 	drawCube(cubeVAO);
 }
 
 void drawFrontLeftLowerLeg(GLuint cubeVAO){
+	glm::vec3 leg_pos = glm::vec3(-0.5*(body.x - leg.y), 0.5*leg.x, 0.5*body.z - 0.5*leg.z) * scaleMod.x;
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5, 0.5, 0.5));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0, 0, 1));
-	translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.25, 0.75, 0.75));
+	translate = glm::translate(glm::mat4(1.0f), leg_pos);
+	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.25, 0.75, 0.75));
 	glUniform1i(fillLoc, 6);
 	drawCube(cubeVAO);
 }
 
 void drawFrontRightUpperLeg(GLuint cubeVAO){
+	glm::vec3 leg_pos = glm::vec3(-0.5*(body.x - leg.y), 1.5*leg.x, -(0.5*body.z - 0.5*leg.z)) * scaleMod.x;
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5, 0.5, 0.5));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0, 0, 1));
-	translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.25, 2.25, -0.75));
+	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.25, 2.25, -0.75));
+	translate = glm::translate(glm::mat4(1.0f), leg_pos);
 	glUniform1i(fillLoc, 5);
 	drawCube(cubeVAO);
 }
 
 void drawFrontRightLowerLeg(GLuint cubeVAO){
+	glm::vec3 leg_pos = glm::vec3(-0.5*(body.x - leg.y), 0.5*leg.x, -(0.5*body.z - 0.5*leg.z)) * scaleMod.x;
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5, 0.5, 0.5));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0, 0, 1));
-	translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.25, 0.75, -0.75));
+//	translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.25, 0.75, -0.75));
+	translate = glm::translate(glm::mat4(1.0f), leg_pos);
 	glUniform1i(fillLoc, 6);
 	drawCube(cubeVAO);
 }
 
 void drawHindLeftUpperLeg(GLuint cubeVAO){
+	glm::vec3 leg_pos = glm::vec3(0.5*(body.x - leg.y), 1.5*leg.x, 0.5*body.z - 0.5*leg.z) * scaleMod.x;
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5, 0.5, 0.5));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0, 0, 1));
-	translate = glm::translate(glm::mat4(1.0f), glm::vec3(2.25, 2.25, 0.75));
+	translate = glm::translate(glm::mat4(1.0f), leg_pos);
+	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(2.25, 2.25, 0.75));
 	glUniform1i(fillLoc, 5);
 	drawCube(cubeVAO);
 }
 
 void drawHindLeftLowerLeg(GLuint cubeVAO){
+	glm::vec3 leg_pos = glm::vec3(0.5*(body.x - leg.y), 0.5*leg.x, 0.5*body.z - 0.5*leg.z) * scaleMod.x;
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5, 0.5, 0.5));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0, 0, 1));
-	translate = glm::translate(glm::mat4(1.0f), glm::vec3(2.25, 0.75, 0.75));
+	translate = glm::translate(glm::mat4(1.0f), leg_pos);
+	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(2.25, 0.75, 0.75));
 	glUniform1i(fillLoc, 6);
 	drawCube(cubeVAO);
 }
 
 void drawHindRightUpperLeg(GLuint cubeVAO){
+	glm::vec3 leg_pos = glm::vec3(0.5*(body.x - leg.y), 1.5*leg.x, -(0.5*body.z - 0.5*leg.z)) * scaleMod.x;
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5, 0.5, 0.5));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0, 0, 1));
-	translate = glm::translate(glm::mat4(1.0f), glm::vec3(2.25, 2.25, -0.75));
+	translate = glm::translate(glm::mat4(1.0f), leg_pos);
+	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(2.25, 2.25, -0.75));
 	glUniform1i(fillLoc, 5);
 	drawCube(cubeVAO);
 }
 
 void drawHindRightLowerLeg(GLuint cubeVAO){
+	glm::vec3 leg_pos = glm::vec3(0.5*(body.x - leg.y), 0.5*leg.x, -(0.5*body.z - 0.5*leg.z)) * scaleMod.x;
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5, 0.5, 0.5));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0, 0, 1));
-	translate = glm::translate(glm::mat4(1.0f), glm::vec3(2.25, 0.75, -0.75));
+	translate = glm::translate(glm::mat4(1.0f), leg_pos);
+	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(2.25, 0.75, -0.75));
 	glUniform1i(fillLoc, 6);
 	drawCube(cubeVAO);
 }
