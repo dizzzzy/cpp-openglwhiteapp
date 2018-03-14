@@ -1,7 +1,8 @@
 // opengl.cpp : Defines the entry point for the console application.
 //
-
+//#define GLM_ENABLE_EXPERIMENTAL
 #include "stdafx.h"
+
 #include <glm.hpp>
 #include "gtc/matrix_transform.hpp"
 #include "gtc/type_ptr.hpp"
@@ -19,11 +20,11 @@ GLuint vm_addr;
 GLuint pm_addr;
 GLuint fillLoc;
 
-//glm::vec3 c_pos = glm::vec3(0, 0, 2);
-//glm::vec3 c_dir = glm::normalize(glm::vec3(0, 0, -2));
-glm::vec3 center = glm::vec3(0, 0, 0); //were locking what the camera is looking at.
 glm::vec3 c_pos = glm::vec3(0, 0, 3);
-glm::vec3 c_dir = glm::normalize(glm::vec3(0, 0, 0));
+glm::vec3 c_dir = glm::normalize(glm::vec3(0, 0, -3));
+glm::vec3 center = glm::vec3(0, 0, 0); //were locking what the camera is looking at.
+//glm::vec3 c_pos = glm::vec3(0, 0, 3);
+//glm::vec3 c_dir = glm::normalize(glm::vec3(0, 0, 0));
 glm::vec3 c_up = glm::vec3(0, 1, 0);
 
 //------ MODEL MATRIX ---------
@@ -34,10 +35,10 @@ glm::mat4 rotate;
 
 //------ VIEW MATRIX ---------
 
-//vm = glm::lookAt(c_pos, c_pos + c_dir, c_up);
-glm::mat4 vm = glm::lookAt(c_pos, //eye
+glm::mat4 vm = glm::lookAt(c_pos, c_pos + c_dir, c_up);
+/*glm::mat4 vm = glm::lookAt(c_pos, //eye
 	center,	//what your looking at, in this case its the center (0,0,0)
-	c_up);	//up vector that defines the worlds up direction
+	c_up);	//up vector that defines the worlds up direction*/
 
 //------ PROJECTION MATRIX -------
 glm::mat4 pm = glm::perspective(45.f, 800.f / 600.f, 0.1f, 100.f);
@@ -54,8 +55,14 @@ glm::vec3 rotateMod = glm::vec3(0, 0, 0);
 glm::vec3 leg = glm::vec3(1.5, 0.5, 0.5);  //really half a leg
 glm::vec3 body = glm::vec3(5, 2, 2);
 
-//-------HORSE BODY PART POSITIONS----------
+//-------MOUSE BUTTONS STATUS----------
+bool right_pressed = false;
+bool left_pressed = false;
+bool middle_pressed = false;
 
+//-------CURSOR POSITION UPON CLICK-----
+double cursorXPos; 
+double cursorYPos;
 
 
 GLuint loadShaders(std::string vertex_shader_path, std::string fragment_shader_path) {
@@ -155,14 +162,14 @@ GLuint loadShaders(std::string vertex_shader_path, std::string fragment_shader_p
 }
 
 void update_view() {
-	//vm = glm::lookAt(c_pos, c_pos + c_dir, c_up);
-	vm = glm::lookAt(c_pos, center, c_up);
+	vm = glm::lookAt(c_pos, c_pos + c_dir, c_up);
+	//vm = glm::lookAt(c_pos, center, c_up);
 }
 
 void scrollCallback(GLFWwindow* window, double xOffset, double yOffset){
 	std::cout << xOffset << " : " << yOffset << std::endl;
 	glm::vec3 zoom;
-	c_dir = glm::normalize(center - c_pos);
+	//c_dir = glm::normalize(center - c_pos);
 	zoom = c_dir * 0.25f;
 	if (yOffset > 0){ //zoom in
 		c_pos += zoom;
@@ -174,6 +181,79 @@ void scrollCallback(GLFWwindow* window, double xOffset, double yOffset){
 	}
 }
 
+void mouse_buttonCallback(GLFWwindow* window, int button, int action, int mods){
+	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS){
+		right_pressed = true;
+		glfwGetCursorPos(window, &cursorXPos, &cursorYPos);
+		std::cout << "Right button pressed " << cursorXPos << ":" << cursorYPos << std::endl;
+	}
+	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE){
+		right_pressed = false;
+		std::cout << "Right button released" << std::endl;
+	}
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS){
+		left_pressed = true;
+		glfwGetCursorPos(window, &cursorXPos, &cursorYPos);
+		std::cout << "Left button pressed " << cursorXPos << ":" << cursorYPos << std::endl;
+	}
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE){
+		left_pressed = false;
+		std::cout << "Left button released" << std::endl;
+	}
+	if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_PRESS){
+		middle_pressed = true;
+		glfwGetCursorPos(window, &cursorXPos, &cursorYPos);
+		std::cout << "Left button pressed " << cursorXPos << ":" << cursorYPos << std::endl;
+	}
+	if (button == GLFW_MOUSE_BUTTON_MIDDLE && action == GLFW_RELEASE){
+		middle_pressed = false;
+		std::cout << "Left button released" << std::endl;
+	}
+	
+}
+
+static void cursorPositionCallback(GLFWwindow* window, double xPos, double yPos){
+	if (left_pressed){	//zoom in and out on left button press
+		std::cout << xPos << ":" << yPos << std::endl;
+		glm::vec3 zoom;
+		//c_dir = glm::normalize(center - c_pos);
+		double yDelta = cursorYPos - yPos;
+		cursorYPos = yPos;
+		zoom = c_dir * 0.25f;
+		if (yDelta > 0){ //zoom in
+			c_pos -= zoom;
+			update_view();
+		}
+		else{		//zoom out
+			c_pos += zoom;
+			update_view();
+		}
+	}
+	else if (right_pressed){
+		glm::vec2 delta;
+		delta.x = cursorXPos - xPos;
+		cursorXPos = xPos;
+		glm::mat4 rotateMatrix(1); //identityMatrix
+		rotateMatrix = glm::rotate(rotateMatrix, delta.x * 0.005f, glm::vec3(0.0, 1.0, 0.0));
+		c_dir = glm::vec3(rotateMatrix * glm::vec4(c_dir, 1.0));
+		update_view();
+		std::cout << "c_dir x: " << c_dir.x << " y: " << c_dir.y << " z: " << c_dir.z << std::endl;
+
+	}
+	else if (middle_pressed){
+		glm::vec2 delta;
+		delta.y = cursorYPos - yPos;
+		cursorYPos = yPos;
+		glm::vec3 toRotateAround = glm::cross(c_dir, c_up);
+		glm::mat4 rotateMatrix(1); //identityMatrix
+		rotateMatrix = glm::rotate(rotateMatrix, delta.y * 0.005f, toRotateAround);
+		c_dir = glm::vec3(rotateMatrix * glm::vec4(c_dir, 1.0));
+		update_view();
+		std::cout << "c_dir x: " << c_dir.x << " y: " << c_dir.y << " z: " << c_dir.z << std::endl;
+	}
+
+}
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	
 	printf("%d\n", key);
@@ -182,13 +262,32 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		glfwSetWindowShouldClose(window, true);
 	}
 
-	if (key == GLFW_KEY_W ) {
+	if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
+		c_pos.y += 0.5;
+		update_view();
+	}
+
+	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
+		c_pos.y -= 0.5;
+		update_view();
+	}
+
+	if (key == GLFW_KEY_LEFT) {
+		c_pos.x -= 0.5;
+		update_view();
+	}
+
+	if (key == GLFW_KEY_RIGHT) {
+		c_pos.x += 0.5;
+		update_view();
+	}
+
+	if (key == GLFW_KEY_W) {
 		if (mods == GLFW_MOD_SHIFT) {
 			translateMod.z -= 1;
 		}
 		else {
-			c_pos.y += 0.5;
-			update_view();
+			//perform rotation
 		}
 	}
 
@@ -197,8 +296,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			translateMod.x -= 1;
 		}
 		else {
-			c_pos.x -= 0.5;
-			update_view();
+			//perform rotation
 		}
 	}
 
@@ -207,8 +305,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			translateMod.z += 1;
 		}
 		else {
-			c_pos.y -= 0.5;
-			update_view();
+			//perform rotation
 		}
 	}
 
@@ -217,8 +314,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			translateMod.x += 1;
 		}
 		else {
-			c_pos.x += 0.5;
-			update_view();
+			//perform rotation
 		}
 	}
 
@@ -263,6 +359,8 @@ int init() {
 
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetScrollCallback(window, scrollCallback);
+	glfwSetMouseButtonCallback(window, mouse_buttonCallback);
+	glfwSetCursorPosCallback(window, cursorPositionCallback);
 
 	if (window == nullptr) {
 		glfwTerminate();
@@ -479,11 +577,11 @@ void drawObj(int vertexNum){
 }
 
 void drawCube(GLuint cubeVAO){
+	rotate *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.x), glm::vec3(1, 0, 0)); //rotation modification around x
+	rotate *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.y), glm::vec3(0, 1, 0)); //rotation modification around y
+	rotate *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.z), glm::vec3(0, 0, 1)); //rotation modification around z
 	scale *= glm::scale(glm::mat4(1.0f), scaleMod);	//scaling modifications
 	translate *= glm::translate(glm::mat4(1.0f), translateMod); //translation modification on all 3 axis
-	rotate *= glm::rotate(glm::mat4(1.0f), glm::radians(0.f), glm::vec3(1, 0, 0)); //rotation modification around x
-	rotate *= glm::rotate(glm::mat4(1.0f), glm::radians(0.f), glm::vec3(0, 1, 0)); //rotation modification around y
-	rotate *= glm::rotate(glm::mat4(1.0f), glm::radians(0.f), glm::vec3(0, 0, 1)); //rotation modification around z
 	mm = translate * rotate * scale;
 	glUniformMatrix4fv(mm_addr, 1, false, glm::value_ptr(mm));
 	glBindVertexArray(cubeVAO);
@@ -544,7 +642,7 @@ void drawHead(GLuint cubeVAO){
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(2, 1.25, 1.25));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0, 0, 1));
 	translate = glm::translate(glm::mat4(1.0f), head_pos);
-	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(-3.75, 5, 0));
+	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(-3.75, 5, 0)* scaleMod.x) ;
 	glUniform1i(fillLoc, 6);
 	drawCube(cubeVAO);
 }
