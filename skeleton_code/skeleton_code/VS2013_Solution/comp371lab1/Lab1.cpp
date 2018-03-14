@@ -699,9 +699,7 @@ void drawNeck(GLuint cubeVAO){
 	jointRotation = glm::rotate(glm::mat4(1.0f), glm::radians(neckToTorso.x), glm::vec3(0, 0, 1)) * jointRotation;
 	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(1, 0, 0)) * jointRotation; //revert translation 
 	//-------------------------------
-	//rotate = jointRotation;
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(-45.0f), glm::vec3(0, 0, 1)) * jointRotation;
-	//translate = glm::mat4(1.0f);
 	translate = glm::translate(glm::mat4(1.0f), neck_pos);
 	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.75, 4.5, 0));
 	glUniform1i(fillLoc, 5);
