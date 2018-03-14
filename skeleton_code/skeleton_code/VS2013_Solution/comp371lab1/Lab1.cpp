@@ -287,7 +287,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			translateMod.z -= 1;
 		}
 		else {
-			//perform rotation
+			rotateMod.z -= 5;
 		}
 	}
 
@@ -296,7 +296,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			translateMod.x -= 1;
 		}
 		else {
-			//perform rotation
+			rotateMod.y += 5; 
 		}
 	}
 
@@ -305,7 +305,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			translateMod.z += 1;
 		}
 		else {
-			//perform rotation
+			rotateMod.z += 5;
 		}
 	}
 
@@ -314,7 +314,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			translateMod.x += 1;
 		}
 		else {
-			//perform rotation
+			rotateMod.y -= 5;
 		}
 	}
 
@@ -577,12 +577,18 @@ void drawObj(int vertexNum){
 }
 
 void drawCube(GLuint cubeVAO){
-	rotate *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.x), glm::vec3(1, 0, 0)); //rotation modification around x
-	rotate *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.y), glm::vec3(0, 1, 0)); //rotation modification around y
-	rotate *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.z), glm::vec3(0, 0, 1)); //rotation modification around z
+	//rotate *= glm::rotate(glm::mat4(1.0f), 0.f, glm::vec3(1, 0, 0)); //rotation modification around x
+	//rotate *= glm::rotate(glm::mat4(1.0f), 0.0f, glm::vec3(0, 1, 0)); //rotation modification around y
+	//rotate *= glm::rotate(glm::mat4(1.0f), 0.0f, glm::vec3(0, 0, 1)); //rotation modification around z
+	//scale *= glm::scale(glm::mat4(1.0f), scaleMod);	//scaling modifications
+	//translate *= glm::translate(glm::mat4(1.0f), translateMod); //translation modification on all 3 axis
+	glm::mat4 rotateModMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.x), glm::vec3(1, 0, 0)); //rotate x
+	rotateModMatrix *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.y), glm::vec3(0, 1, 0)); //rotate y
+	rotateModMatrix *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.z), glm::vec3(0, 0, 1)); //rotate z
+	//glm::mat4 scaleModMatrix = glm::scale(glm::mat4(1.0f), scaleMod);
 	scale *= glm::scale(glm::mat4(1.0f), scaleMod);	//scaling modifications
-	translate *= glm::translate(glm::mat4(1.0f), translateMod); //translation modification on all 3 axis
-	mm = translate * rotate * scale;
+	glm::mat4 translateModMatrix = glm::translate(glm::mat4(1.0f), translateMod); //translation modification on all 3 axis
+	mm =  translateModMatrix * rotateModMatrix * translate * rotate * scale;
 	glUniformMatrix4fv(mm_addr, 1, false, glm::value_ptr(mm));
 	glBindVertexArray(cubeVAO);
 	drawObj(36);
