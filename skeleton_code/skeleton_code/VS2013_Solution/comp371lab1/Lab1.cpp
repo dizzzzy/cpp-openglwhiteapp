@@ -64,6 +64,18 @@ bool middle_pressed = false;
 double cursorXPos; 
 double cursorYPos;
 
+//---------Joint Rotation Angle--------
+glm::fvec1 headToNeck;
+glm::fvec1 neckToTorso;
+glm::fvec1 torsoToFrontUpperRightLeg;
+glm::fvec1 frontRightKnee;
+glm::fvec1 torsoToFrontUpperLeftLeg;
+glm::fvec1 frontLeftKnee;
+glm::fvec1 torsoToHindUpperRightLeg;
+glm::fvec1 hindRightKnee;
+glm::fvec1 torsoToHindUpperLeftLeg;
+glm::fvec1 hindLeftKnee;
+
 
 GLuint loadShaders(std::string vertex_shader_path, std::string fragment_shader_path) {
 
@@ -262,12 +274,57 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		glfwSetWindowShouldClose(window, true);
 	}
 
-	if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
+	if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
+		if (mods == GLFW_MOD_SHIFT) {
+			neckToTorso.x += 5;
+		}
+		else {
+			neckToTorso.x -= 5;
+		}
+	}
+
+	if (key == GLFW_KEY_9 && action == GLFW_PRESS) {
+		if (mods == GLFW_MOD_SHIFT) {
+			torsoToHindUpperLeftLeg.x += 5;
+		}
+		else {
+			torsoToHindUpperLeftLeg.x -= 5;
+		}
+	}
+
+	if (key == GLFW_KEY_7 && action == GLFW_PRESS) {
+		if (mods == GLFW_MOD_SHIFT) {
+			torsoToFrontUpperLeftLeg.x += 5;
+		}
+		else {
+			torsoToFrontUpperLeftLeg.x -= 5;
+		}
+	}
+
+	if (key == GLFW_KEY_5 && action == GLFW_PRESS) {
+		if (mods == GLFW_MOD_SHIFT) {
+			torsoToHindUpperRightLeg.x += 5;
+		}
+		else {
+			torsoToHindUpperRightLeg.x -= 5;
+		}
+	}
+
+	if (key == GLFW_KEY_3 && action == GLFW_PRESS) {
+		if (mods == GLFW_MOD_SHIFT) {
+			torsoToFrontUpperRightLeg.x += 5;
+		}
+		else {
+			torsoToFrontUpperRightLeg.x -= 5;
+		}
+	}
+
+	if (key == GLFW_KEY_UP) {
 		c_pos.y += 0.5;
 		update_view();
 	}
 
-	if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
+	if (key == GLFW_KEY_DOWN) {
 		c_pos.y -= 0.5;
 		update_view();
 	}
@@ -636,7 +693,15 @@ void drawBody(GLuint cubeVAO){  //torso
 void drawNeck(GLuint cubeVAO){
 	glm::vec3 neck_pos = glm::vec3(-0.55* body.x, 1.125*(body.y / 2 + leg.x * 2), 0) * scaleMod.x;
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(2, 1.25, 1.25));
-	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(-45.0f), glm::vec3(0, 0, 1));
+	//---------JOINT ROTATION------------
+	glm::mat4 jointRotation;
+	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(-1, 0, 0)); //translate joint down to (0,0,0)
+	jointRotation = glm::rotate(glm::mat4(1.0f), glm::radians(neckToTorso.x), glm::vec3(0, 0, 1)) * jointRotation;
+	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(1, 0, 0)) * jointRotation; //revert translation 
+	//-------------------------------
+	//rotate = jointRotation;
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(-45.0f), glm::vec3(0, 0, 1)) * jointRotation;
+	//translate = glm::mat4(1.0f);
 	translate = glm::translate(glm::mat4(1.0f), neck_pos);
 	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.75, 4.5, 0));
 	glUniform1i(fillLoc, 5);
@@ -657,8 +722,14 @@ void drawFrontLeftUpperLeg(GLuint cubeVAO){
 	glm::vec3 leg_pos = glm::vec3(-0.5*(body.x - leg.y), 1.5*leg.x , 0.5*body.z - 0.5*leg.z) * scaleMod.x;
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5, 0.5, 0.5));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0, 0, 1));
+	//---------JOINT ROTATION------------
+	glm::mat4 jointRotation;
+	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.75, 0)); //translate joint down to (0,0,0)
+	jointRotation = glm::rotate(glm::mat4(1.0f), glm::radians(torsoToFrontUpperLeftLeg.x), glm::vec3(0, 0, 1)) * jointRotation;
+	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.75, 0)) *jointRotation; //revert translation 
+	//---------------------------------
 	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.25, 2.25, 0.75));
-	translate = glm::translate(glm::mat4(1.0f), glm::vec3(leg_pos));
+	translate = glm::translate(glm::mat4(1.0f), glm::vec3(leg_pos)) * jointRotation;
 	glUniform1i(fillLoc, 5);
 	drawCube(cubeVAO);
 }
@@ -677,8 +748,16 @@ void drawFrontRightUpperLeg(GLuint cubeVAO){
 	glm::vec3 leg_pos = glm::vec3(-0.5*(body.x - leg.y), 1.5*leg.x, -(0.5*body.z - 0.5*leg.z)) * scaleMod.x;
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5, 0.5, 0.5));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0, 0, 1));
+
+	//---------JOINT ROTATION------------
+	glm::mat4 jointRotation;
+	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.75, 0)); //translate joint down to (0,0,0)
+	jointRotation = glm::rotate(glm::mat4(1.0f), glm::radians(torsoToFrontUpperRightLeg.x), glm::vec3(0, 0, 1)) * jointRotation;
+	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.75, 0)) *jointRotation; //revert translation 
+	//---------------------------------
+
 	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.25, 2.25, -0.75));
-	translate = glm::translate(glm::mat4(1.0f), leg_pos);
+	translate = glm::translate(glm::mat4(1.0f), leg_pos) * jointRotation;
 	glUniform1i(fillLoc, 5);
 	drawCube(cubeVAO);
 }
@@ -697,7 +776,13 @@ void drawHindLeftUpperLeg(GLuint cubeVAO){
 	glm::vec3 leg_pos = glm::vec3(0.5*(body.x - leg.y), 1.5*leg.x, 0.5*body.z - 0.5*leg.z) * scaleMod.x;
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5, 0.5, 0.5));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0, 0, 1));
-	translate = glm::translate(glm::mat4(1.0f), leg_pos);
+	//---------JOINT ROTATION------------
+	glm::mat4 jointRotation;
+	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.75, 0)); //translate joint down to (0,0,0)
+	jointRotation = glm::rotate(glm::mat4(1.0f), glm::radians(torsoToHindUpperLeftLeg.x), glm::vec3(0, 0, 1)) * jointRotation;
+	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.75, 0)) *jointRotation; //revert translation 
+	//-------------------------------
+	translate = glm::translate(glm::mat4(1.0f), leg_pos) * jointRotation;
 	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(2.25, 2.25, 0.75));
 	glUniform1i(fillLoc, 5);
 	drawCube(cubeVAO);
@@ -717,7 +802,13 @@ void drawHindRightUpperLeg(GLuint cubeVAO){
 	glm::vec3 leg_pos = glm::vec3(0.5*(body.x - leg.y), 1.5*leg.x, -(0.5*body.z - 0.5*leg.z)) * scaleMod.x;
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5, 0.5, 0.5));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0, 0, 1));
-	translate = glm::translate(glm::mat4(1.0f), leg_pos);
+	//---------JOINT ROTATION------------
+	glm::mat4 jointRotation;
+	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.75, 0)); //translate joint down to (0,0,0)
+	jointRotation = glm::rotate(glm::mat4(1.0f), glm::radians(torsoToHindUpperRightLeg.x), glm::vec3(0, 0, 1)) * jointRotation;
+	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.75, 0)) *jointRotation; //revert translation 
+	//-------------------------------
+	translate = glm::translate(glm::mat4(1.0f), leg_pos)* jointRotation;
 	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(2.25, 2.25, -0.75));
 	glUniform1i(fillLoc, 5);
 	drawCube(cubeVAO);

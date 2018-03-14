@@ -1,16 +1,16 @@
-﻿Build started 3/14/2018 12:12:09 AM.
+﻿Build started 3/14/2018 3:27:12 PM.
      1>Project "D:\projects\cpp-openglwhiteapp\skeleton_code\skeleton_code\VS2013_Solution\COMP371Lab1\COMP371Lab1.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I..\glm\gtx /I..\glm\gtc /I..\glm\detail /I..\glm /I..\glfw /I..\glew /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt Lab1.cpp
          Lab1.cpp
-     1>d:\projects\cpp-openglwhiteapp\skeleton_code\skeleton_code\vs2013_solution\comp371lab1\lab1.cpp(234): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
-     1>d:\projects\cpp-openglwhiteapp\skeleton_code\skeleton_code\vs2013_solution\comp371lab1\lab1.cpp(245): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
-     1>d:\projects\cpp-openglwhiteapp\skeleton_code\skeleton_code\vs2013_solution\comp371lab1\lab1.cpp(341): warning C4305: '*=' : truncation from 'double' to 'float'
-     1>d:\projects\cpp-openglwhiteapp\skeleton_code\skeleton_code\vs2013_solution\comp371lab1\lab1.cpp(342): warning C4305: '*=' : truncation from 'double' to 'float'
-     1>d:\projects\cpp-openglwhiteapp\skeleton_code\skeleton_code\vs2013_solution\comp371lab1\lab1.cpp(343): warning C4305: '*=' : truncation from 'double' to 'float'
-     1>d:\projects\cpp-openglwhiteapp\skeleton_code\skeleton_code\vs2013_solution\comp371lab1\lab1.cpp(348): warning C4305: '/=' : truncation from 'double' to 'float'
-     1>d:\projects\cpp-openglwhiteapp\skeleton_code\skeleton_code\vs2013_solution\comp371lab1\lab1.cpp(349): warning C4305: '/=' : truncation from 'double' to 'float'
-     1>d:\projects\cpp-openglwhiteapp\skeleton_code\skeleton_code\vs2013_solution\comp371lab1\lab1.cpp(350): warning C4305: '/=' : truncation from 'double' to 'float'
+     1>d:\projects\cpp-openglwhiteapp\skeleton_code\skeleton_code\vs2013_solution\comp371lab1\lab1.cpp(246): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>d:\projects\cpp-openglwhiteapp\skeleton_code\skeleton_code\vs2013_solution\comp371lab1\lab1.cpp(257): warning C4244: '=' : conversion from 'double' to 'float', possible loss of data
+     1>d:\projects\cpp-openglwhiteapp\skeleton_code\skeleton_code\vs2013_solution\comp371lab1\lab1.cpp(398): warning C4305: '*=' : truncation from 'double' to 'float'
+     1>d:\projects\cpp-openglwhiteapp\skeleton_code\skeleton_code\vs2013_solution\comp371lab1\lab1.cpp(399): warning C4305: '*=' : truncation from 'double' to 'float'
+     1>d:\projects\cpp-openglwhiteapp\skeleton_code\skeleton_code\vs2013_solution\comp371lab1\lab1.cpp(400): warning C4305: '*=' : truncation from 'double' to 'float'
+     1>d:\projects\cpp-openglwhiteapp\skeleton_code\skeleton_code\vs2013_solution\comp371lab1\lab1.cpp(405): warning C4305: '/=' : truncation from 'double' to 'float'
+     1>d:\projects\cpp-openglwhiteapp\skeleton_code\skeleton_code\vs2013_solution\comp371lab1\lab1.cpp(406): warning C4305: '/=' : truncation from 'double' to 'float'
+     1>d:\projects\cpp-openglwhiteapp\skeleton_code\skeleton_code\vs2013_solution\comp371lab1\lab1.cpp(407): warning C4305: '/=' : truncation from 'double' to 'float'
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\projects\cpp-openglwhiteapp\skeleton_code\skeleton_code\VS2013_Solution\Debug\COMP371Lab1.exe" /INCREMENTAL /NOLOGO /LIBPATH:..\glfw /LIBPATH:..\glew glew32.lib glu32.lib opengl32.lib glfw3dll.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:\projects\cpp-openglwhiteapp\skeleton_code\skeleton_code\VS2013_Solution\Debug\COMP371Lab1.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\projects\cpp-openglwhiteapp\skeleton_code\skeleton_code\VS2013_Solution\Debug\COMP371Lab1.lib" /MACHINE:X86 Debug\Lab1.obj
          Debug\stdafx.obj
@@ -19,4 +19,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:04.21
+Time Elapsed 00:00:03.53
