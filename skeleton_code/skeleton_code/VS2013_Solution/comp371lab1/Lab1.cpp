@@ -2,7 +2,7 @@
 //
 //#define GLM_ENABLE_EXPERIMENTAL
 #include "stdafx.h"
-
+#include "stb_image.h"
 #include <glm.hpp>
 #include "gtc/matrix_transform.hpp"
 #include "gtc/type_ptr.hpp"
@@ -11,6 +11,7 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <fstream>
 
 GLFWwindow* window;
@@ -508,42 +509,88 @@ int init() {
 
 GLuint initCube(){
 	GLfloat cube_vertices[] = { // 1x1x1 cube centered at (0,0,0)
-		-0.5f, -0.5f, -0.5f,
+		/*-0.5f, -0.5f, -0.5f, original
 		-0.5f, -0.5f, 0.5f,
 		-0.5f, 0.5f, 0.5f,
 		0.5f, 0.5f, -0.5f,
 		-0.5f, -0.5f, -0.5f,
 		-0.5f, 0.5f, -0.5f,
+
 		0.5f, -0.5f, 0.5f,
 		-0.5f, -0.5f, -0.5f,
 		0.5f, -0.5f, -0.5f,
 		0.5f, 0.5f, -0.5f,
 		0.5f, -0.5f, -0.5f,
 		-0.5f, -0.5f, -0.5f,
+
 		-0.5f, -0.5f, -0.5f,
 		-0.5f, 0.5f, 0.5f,
 		-0.5f, 0.5f, -0.5f,
 		0.5f, -0.5f, 0.5f,
 		-0.5f, -0.5f, 0.5f,
 		-0.5f, -0.5f, -0.5f,
+
 		-0.5f, 0.5f, 0.5f,
 		-0.5f, -0.5f, 0.5f,
 		0.5f, -0.5f, 0.5f,
 		0.5f, 0.5f, 0.5f,
 		0.5f, -0.5f, -0.5f,
 		0.5f, 0.5f, -0.5f,
+
 		0.5f, -0.5f, -0.5f,
 		0.5f, 0.5f, 0.5f,
 		0.5f, -0.5f, 0.5f,
 		0.5f, 0.5f, 0.5f,
 		0.5f, 0.5f, -0.5f,
 		-0.5f, 0.5f, -0.5f,
+
 		0.5f, 0.5f, 0.5f,
 		-0.5f, 0.5f, -0.5f,
 		-0.5f, 0.5f, 0.5f,
 		0.5f, 0.5f, 0.5f,
 		-0.5f, 0.5f, 0.5f,
-		0.5f, -0.5f, 0.5f
+		0.5f, -0.5f, 0.5f*/
+		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+		0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
+		0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+		0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+		-0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+
+		-0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+		0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+		0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
+		0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
+		-0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
+		-0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+
+		-0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+		-0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+		-0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+		-0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+
+		0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+		0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+		0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+		0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+		0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+		0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+
+		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+		0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
+		0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+		0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+		-0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+
+		-0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
+		0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+		0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+		0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+		-0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
+		-0.5f, 0.5f, -0.5f, 0.0f, 1.0f
 	};
 
 	GLuint VAO, VBO;
@@ -555,13 +602,48 @@ GLuint initCube(){
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	/*glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0); original
+	glEnableVertexAttribArray(0);*/
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
 
 	glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs), remember: do NOT unbind the EBO, keep it bound to this VAO
 	
+	// load and create a texture 
+	// -------------------------
+	GLuint texture1;
+	// texture 1
+	// ---------
+	glGenTextures(1, &texture1);
+	glBindTexture(GL_TEXTURE_2D, texture1);
+	// set the texture wrapping parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// set texture filtering parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	// load image, create texture and generate mipmaps
+	int width, height, nrChannels;
+	stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
+	unsigned char *data = stbi_load("horse_skin.jpg", &width, &height, &nrChannels, 0); //"" container.jpg
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+		getchar();
+	}
+	stbi_image_free(data);
+
 	return VAO;
 }
 
