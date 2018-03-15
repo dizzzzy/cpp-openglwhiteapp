@@ -14,12 +14,16 @@
 #include <sstream>
 #include <fstream>
 
+
+GLuint shdr;
+
 GLFWwindow* window;
 
 GLuint mm_addr;
 GLuint vm_addr;
 GLuint pm_addr;
 GLuint fillLoc;
+GLuint shader_x_pressed;
 
 glm::vec3 c_pos = glm::vec3(0, 0, 3);
 glm::vec3 c_dir = glm::normalize(glm::vec3(0, 0, -3));
@@ -60,6 +64,7 @@ glm::vec3 body = glm::vec3(5, 2, 2);
 bool right_pressed = false;
 bool left_pressed = false;
 bool middle_pressed = false;
+bool x_pressed = false;
 
 //-------CURSOR POSITION UPON CLICK-----
 double cursorXPos; 
@@ -95,6 +100,8 @@ glm::mat4 hindLeftKneeMatrix;
 //TESTING PURPOSES
 glm::mat4 translateBacktoOrigin;
 glm::mat4 jointTransformation;
+
+
 
 GLuint loadShaders(std::string vertex_shader_path, std::string fragment_shader_path) {
 
@@ -293,6 +300,15 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		glfwSetWindowShouldClose(window, true);
 	}
 
+	if (key == GLFW_KEY_X && action == GLFW_PRESS) {
+		if (x_pressed){
+			x_pressed = false;
+		}
+		else{
+			x_pressed = true;
+		}
+		std::cout << "x_pressed: " << x_pressed << std::endl;
+	}
 
 	if (key == GLFW_KEY_9) {
 		if (mods == GLFW_MOD_SHIFT) {
@@ -615,35 +631,6 @@ GLuint initCube(){
 
 	glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs), remember: do NOT unbind the EBO, keep it bound to this VAO
 	
-	// load and create a texture 
-	// -------------------------
-	GLuint texture1;
-	// texture 1
-	// ---------
-	glGenTextures(1, &texture1);
-	glBindTexture(GL_TEXTURE_2D, texture1);
-	// set the texture wrapping parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	// set texture filtering parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// load image, create texture and generate mipmaps
-	int width, height, nrChannels;
-	stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-	unsigned char *data = stbi_load("horse_skin.jpg", &width, &height, &nrChannels, 0); //"" container.jpg
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "Failed to load texture" << std::endl;
-		getchar();
-	}
-	stbi_image_free(data);
-
 	return VAO;
 }
 
@@ -772,6 +759,45 @@ GLuint initGrid(){
 	return VAO;
 }
 
+GLuint initNewGrid(){
+	GLfloat grid_vertices[] =
+	{
+		-50.0f, 0, -50.0f, 0.0f, 0.0f,
+		50.0f, 0, -50.0f, 1.0f, 0.0f,
+		-50.0f, 0, 50.0f, 0.0f, 1.0f,
+
+		50.0f, 0, -50.0f, 1.0f, 0.0f,
+		50.0f, 0, 50.0f, 1.0f, 1.0f,
+		-50.0f, 0, 50.0f, 0.0, 1.0f
+	};
+
+	GLuint VAO, VBO;
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	// Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
+	glBindVertexArray(VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(grid_vertices), grid_vertices, GL_STATIC_DRAW);
+
+	/*glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0); original
+	glEnableVertexAttribArray(0);*/
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
+
+	glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs), remember: do NOT unbind the EBO, keep it bound to this VAO
+
+
+	
+
+	return VAO;
+}
 
 void drawObj(int vertexNum){
 	if (mode == 'T'){
@@ -835,6 +861,14 @@ void drawGrid(GLuint gridVAO){
 	glBindVertexArray(0);
 }
 
+void drawNewGrid(GLuint newGridVAO){
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glUniform1i(fillLoc, 7);
+	glBindVertexArray(newGridVAO);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindVertexArray(0);
+}
+
 void drawBody(GLuint cubeVAO){  //torso
 	glm::vec3 body_pos = glm::vec3(0, body.y / 2 + leg.x * 2, 0) * scaleMod.x;
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3( 5, 2, 2)); // 5 2 2
@@ -873,7 +907,6 @@ void drawNeck(GLuint cubeVAO){
 	translateBacktoOrigin = glm::translate(glm::mat4(1.0f), glm::vec3(-joint2Point.x, -joint2Point.y, -joint2Point.z)); //translation modification on all 3 axis
 	glm::mat4 translateBacktoLocation = glm::translate(glm::mat4(1.0f), glm::vec3(joint2Point.x, joint2Point.y, joint2Point.z)); //translation modification on all 3 axis
 	jointTransformation = translateBacktoLocation * glm::rotate(glm::mat4(1.0f), glm::radians(neckToTorso.x), glm::vec3(0, 0, 1)) * translateBacktoOrigin; //translateBacktoLocation * 
-	std::cout << "x: " << joint2Point.x << " y: " << joint2Point.y << " z: " << joint2Point.z << std::endl;
 	//---------------------------------------
 
 	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.75, 4.5, 0));
@@ -1097,13 +1130,82 @@ void resetModelMatrix(){
 	glUniformMatrix4fv(mm_addr, 1, false, glm::value_ptr(mm));
 }
 
+GLuint loadTexture1(){
+	// load and create a texture 
+	// -------------------------
+	GLuint texture1;
+	// texture 1
+	// ---------
+	glGenTextures(1, &texture1);
+	glBindTexture(GL_TEXTURE_2D, texture1);
+	// set the texture wrapping parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// set texture filtering parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	// load image, create texture and generate mipmaps
+	int width, height, nrChannels;
+	stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
+	unsigned char *data = stbi_load("horse_skin.jpg", &width, &height, &nrChannels, 0); //"" container.jpg
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+		getchar();
+	}
+	stbi_image_free(data);
+
+	glUniform1i(glGetUniformLocation(shdr, "texture1"), 0);
+	return texture1;
+}
+
+GLuint loadTexture2(){
+	// load and create a texture 
+	// -------------------------
+	GLuint texture2;
+	// texture 1
+	// ---------
+	glGenTextures(1, &texture2);
+	glBindTexture(GL_TEXTURE_2D, texture2);
+	// set the texture wrapping parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	// set texture filtering parameters
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	// load image, create texture and generate mipmaps
+	int width, height, nrChannels;
+	stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
+	unsigned char *data = stbi_load("grass.jpg", &width, &height, &nrChannels, 0); //"" container.jpg
+	if (data)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "Failed to load texture" << std::endl;
+		getchar();
+	}
+	stbi_image_free(data);
+
+	glUniform1i(glGetUniformLocation(shdr, "texture2"), 1);
+	return texture2;
+}
+
+
 int main() {
 
 	if (init() != 0) {
 		return -1;
 	}
 
-	GLuint shdr = loadShaders("v.glsl", "f.glsl");
+	shdr = loadShaders("v.glsl", "f.glsl");
 	glUseProgram(shdr);
 
 
@@ -1113,12 +1215,17 @@ int main() {
 	GLuint y_axisVAO = initYAxis();
 	GLuint z_axisVAO = initZAxis();
 	GLuint gridVAO = initGrid();
+	GLuint newGridVAO = initNewGrid();
+	GLuint texture1 = loadTexture1();
+	GLuint texture2 = loadTexture2();
+	
+
 
 	mm_addr = glGetUniformLocation(shdr, "m_m");
 	vm_addr = glGetUniformLocation(shdr, "v_m");
 	pm_addr = glGetUniformLocation(shdr, "p_m");
 	fillLoc = glGetUniformLocation(shdr, "fill");
-	
+	shader_x_pressed = glGetUniformLocation(shdr, "shader_x_pressed");
 
 	glClearColor(0.7f, 0.7f, 0.7f, 0);
 	glEnable(GL_DEPTH_TEST);
@@ -1138,10 +1245,25 @@ int main() {
 		glUniformMatrix4fv(mm_addr, 1, false, glm::value_ptr(mm));
 		glUniformMatrix4fv(vm_addr, 1, false, glm::value_ptr(vm));
 		glUniformMatrix4fv(pm_addr, 1, false, glm::value_ptr(pm));//needed to make sure that they are initialized in the shader (i think?)
+		if (x_pressed){
+			glUniform1i(shader_x_pressed, 1);
+			//load textures and new grid
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, texture2);
+			drawNewGrid(newGridVAO);
+			glBindTexture(GL_TEXTURE_2D, 0);
 
-		drawGrid(gridVAO);
-		drawHorse(cubeVAO);
-	
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, texture1);
+			drawHorse(cubeVAO);
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+		else{
+			glUniform1i(shader_x_pressed, 0);
+			drawGrid(gridVAO);
+			drawHorse(cubeVAO);
+		}
+
 		resetModelMatrix();
 
 		drawXAxis(x_axisVAO);
