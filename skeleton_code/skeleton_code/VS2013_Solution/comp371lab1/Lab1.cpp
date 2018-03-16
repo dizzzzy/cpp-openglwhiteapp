@@ -32,6 +32,7 @@ GLuint light_vm_addr;
 GLuint light_pm_addr;
 
 
+glm::vec3 l_pos = glm::vec3(0, 20, 0);
 glm::vec3 c_pos = glm::vec3(0, 0, 3);
 glm::vec3 c_dir = glm::normalize(glm::vec3(0, 0, -3));
 glm::vec3 center = glm::vec3(0, 0, 0); //were locking what the camera is looking at.
@@ -1313,6 +1314,7 @@ int main() {
 	light_pm_addr = glGetUniformLocation(light_shder, "p_m");
 
 	glUseProgram(shdr);
+	glUniform3f(glGetUniformLocation(shdr, "lightColor"),0.5, 0.5, 0.5);
 	//Component Initialization
 	GLuint cubeVAO = initCube();
 	GLuint lampVAO = initLamp();
@@ -1371,9 +1373,12 @@ int main() {
 		drawZAxis(z_axisVAO);
 
 		glUseProgram(light_shder);
-		glUniformMatrix4fv(light_mm_addr, 1, false, glm::value_ptr(mm));
 		glUniformMatrix4fv(light_vm_addr, 1, false, glm::value_ptr(vm));
 		glUniformMatrix4fv(light_pm_addr, 1, false, glm::value_ptr(pm));//needed to make sure that they are initialized in the shader (i think?)
+		glm::mat4 model = glm::mat4();
+		model = glm::translate(model, l_pos);
+		model = glm::scale(model, glm::vec3(0.2f));
+		glUniformMatrix4fv(light_mm_addr, 1, false, glm::value_ptr(model));
 		drawLamp(lampVAO);
 
 	}
