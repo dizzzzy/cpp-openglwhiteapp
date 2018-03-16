@@ -16,6 +16,7 @@
 
 
 GLuint shdr;
+GLuint light_shder;
 
 GLFWwindow* window;
 
@@ -24,6 +25,12 @@ GLuint vm_addr;
 GLuint pm_addr;
 GLuint fillLoc;
 GLuint shader_x_pressed;
+
+
+GLuint light_mm_addr;
+GLuint light_vm_addr;
+GLuint light_pm_addr;
+
 
 glm::vec3 c_pos = glm::vec3(0, 0, 3);
 glm::vec3 c_dir = glm::normalize(glm::vec3(0, 0, -3));
@@ -566,47 +573,48 @@ GLuint initCube(){
 		0.5f, 0.5f, 0.5f,
 		-0.5f, 0.5f, 0.5f,
 		0.5f, -0.5f, 0.5f*/
-		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
-		0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
-		0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-		0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-		-0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
+		//position				//texture		//normal
+		-0.5f, -0.5f, -0.5f,	0.0f, 0.0f,		0.0f, 0.0f, -1.0f,
+		0.5f, -0.5f, -0.5f,		1.0f, 0.0f,		0.0f, 0.0f, -1.0f,
+		0.5f, 0.5f, -0.5f,		1.0f, 1.0f,		0.0f, 0.0f, -1.0f,
+		0.5f, 0.5f, -0.5f,		1.0f, 1.0f,		0.0f, 0.0f, -1.0f,
+		-0.5f, 0.5f, -0.5f,		0.0f, 1.0f,		0.0f, 0.0f, -1.0f,
+		-0.5f, -0.5f, -0.5f,	0.0f, 0.0f,		0.0f, 0.0f, -1.0f,
 
-		-0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-		0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-		0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-		0.5f, 0.5f, 0.5f, 1.0f, 1.0f,
-		-0.5f, 0.5f, 0.5f, 0.0f, 1.0f,
-		-0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
+		-0.5f, -0.5f, 0.5f,		0.0f, 0.0f,		0.0f,  0.0f,  1.0f,
+		0.5f, -0.5f, 0.5f,		1.0f, 0.0f,		0.0f,  0.0f,  1.0f,
+		0.5f, 0.5f, 0.5f,		1.0f, 1.0f,		0.0f,  0.0f,  1.0f,
+		0.5f, 0.5f, 0.5f,		1.0f, 1.0f,		0.0f,  0.0f,  1.0f,
+		-0.5f, 0.5f, 0.5f,		0.0f, 1.0f,		0.0f,  0.0f,  1.0f,
+		-0.5f, -0.5f, 0.5f,		0.0f, 0.0f,		0.0f,  0.0f,  1.0f,
 
-		-0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-		-0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-		-0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-		-0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+		-0.5f, 0.5f, 0.5f,		1.0f, 0.0f,		-1.0f,  0.0f,  0.0f,
+		-0.5f, 0.5f, -0.5f,		1.0f, 1.0f,		-1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f,	0.0f, 1.0f,		-1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f,	0.0f, 1.0f,		-1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f, 0.5f,		0.0f, 0.0f,		-1.0f,  0.0f,  0.0f,
+		-0.5f, 0.5f, 0.5f,		1.0f, 0.0f,		-1.0f,  0.0f,  0.0f,
 
-		0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-		0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-		0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-		0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-		0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-		0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
+		0.5f, 0.5f, 0.5f,		1.0f, 0.0f,		1.0f,  0.0f,  0.0f,
+		0.5f, 0.5f, -0.5f,		1.0f, 1.0f,		1.0f,  0.0f,  0.0f,
+		0.5f, -0.5f, -0.5f,		0.0f, 1.0f,		1.0f,  0.0f,  0.0f,
+		0.5f, -0.5f, -0.5f,		0.0f, 1.0f,		1.0f,  0.0f,  0.0f,
+		0.5f, -0.5f, 0.5f,		0.0f, 0.0f,		1.0f,  0.0f,  0.0f,
+		0.5f, 0.5f, 0.5f,		1.0f, 0.0f,		1.0f,  0.0f,  0.0f,
 
-		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
-		0.5f, -0.5f, -0.5f, 1.0f, 1.0f,
-		0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-		0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-		-0.5f, -0.5f, 0.5f, 0.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,	0.0f, 1.0f,		0.0f, -1.0f,  0.0f,
+		0.5f, -0.5f, -0.5f,		1.0f, 1.0f,		0.0f, -1.0f,  0.0f,
+		0.5f, -0.5f, 0.5f,		1.0f, 0.0f,		0.0f, -1.0f,  0.0f,
+		0.5f, -0.5f, 0.5f,		1.0f, 0.0f,		0.0f, -1.0f,  0.0f,
+		-0.5f, -0.5f, 0.5f,		0.0f, 0.0f,		0.0f, -1.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f,	0.0f, 1.0f,		0.0f, -1.0f,  0.0f,
 
-		-0.5f, 0.5f, -0.5f, 0.0f, 1.0f,
-		0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-		0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-		0.5f, 0.5f, 0.5f, 1.0f, 0.0f,
-		-0.5f, 0.5f, 0.5f, 0.0f, 0.0f,
-		-0.5f, 0.5f, -0.5f, 0.0f, 1.0f
+		-0.5f, 0.5f, -0.5f,		0.0f, 1.0f,		0.0f,  1.0f,  0.0f,
+		0.5f, 0.5f, -0.5f,		1.0f, 1.0f,		0.0f,  1.0f,  0.0f,
+		0.5f, 0.5f, 0.5f,		1.0f, 0.0f,		0.0f,  1.0f,  0.0f,
+		0.5f, 0.5f, 0.5f,		1.0f, 0.0f,		0.0f,  1.0f,  0.0f,
+		-0.5f, 0.5f, 0.5f,		0.0f, 0.0f,		0.0f,  1.0f,  0.0f,
+		-0.5f, 0.5f, -0.5f,		0.0f, 1.0f,		0.0f,  1.0f,  0.0f
 	};
 
 	GLuint VAO, VBO;
@@ -621,11 +629,14 @@ GLuint initCube(){
 	/*glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0); original
 	glEnableVertexAttribArray(0);*/
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
+
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(2);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
 
@@ -797,6 +808,87 @@ GLuint initNewGrid(){
 	
 
 	return VAO;
+}
+
+GLuint initLamp(){
+	GLfloat lamp_vertices[] = { // 1x1x1 cube centered at (0,0,0)
+		//position				//texture		//normal
+		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+		0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+		0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+		0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+		-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+		-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+
+		-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+		0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+		0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+		0.5f, 0.5f, 0.5f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+		-0.5f, 0.5f, 0.5f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+		-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+
+		-0.5f, 0.5f, 0.5f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+		-0.5f, 0.5f, -0.5f, 1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+		-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+		-0.5f, 0.5f, 0.5f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+
+		0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+		0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+		0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+		0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+		0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+		0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+
+		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+		0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+		0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+		0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+		-0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+
+		-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+		0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+		0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+		0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+		-0.5f, 0.5f, 0.5f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+		-0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f
+	};
+
+	GLuint VAO, VBO;
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	// Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
+	glBindVertexArray(VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(lamp_vertices), lamp_vertices, GL_STATIC_DRAW);
+
+	/*glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0); original
+	glEnableVertexAttribArray(0);*/
+
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(1);
+
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(2);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
+
+	glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs), remember: do NOT unbind the EBO, keep it bound to this VAO
+
+	return VAO;
+}
+
+void drawLamp(GLuint lampVAO){
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	glBindVertexArray(lampVAO);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
 }
 
 void drawObj(int vertexNum){
@@ -1206,11 +1298,24 @@ int main() {
 	}
 
 	shdr = loadShaders("v.glsl", "f.glsl");
+	light_shder = loadShaders("v_lamp.glsl", "f_lamp.glsl");
+	
 	glUseProgram(shdr);
+	mm_addr = glGetUniformLocation(shdr, "m_m");
+	vm_addr = glGetUniformLocation(shdr, "v_m");
+	pm_addr = glGetUniformLocation(shdr, "p_m");
+	fillLoc = glGetUniformLocation(shdr, "fill");
+	shader_x_pressed = glGetUniformLocation(shdr, "shader_x_pressed");
 
+	glUseProgram(light_shder);
+	light_mm_addr = glGetUniformLocation(light_shder, "m_m");
+	light_vm_addr = glGetUniformLocation(light_shder, "v_m");
+	light_pm_addr = glGetUniformLocation(light_shder, "p_m");
 
+	glUseProgram(shdr);
 	//Component Initialization
 	GLuint cubeVAO = initCube();
+	GLuint lampVAO = initLamp();
 	GLuint x_axisVAO = initXAxis();
 	GLuint y_axisVAO = initYAxis();
 	GLuint z_axisVAO = initZAxis();
@@ -1219,23 +1324,18 @@ int main() {
 	GLuint texture1 = loadTexture1();
 	GLuint texture2 = loadTexture2();
 	
-
-
-	mm_addr = glGetUniformLocation(shdr, "m_m");
-	vm_addr = glGetUniformLocation(shdr, "v_m");
-	pm_addr = glGetUniformLocation(shdr, "p_m");
-	fillLoc = glGetUniformLocation(shdr, "fill");
-	shader_x_pressed = glGetUniformLocation(shdr, "shader_x_pressed");
-
 	glClearColor(0.7f, 0.7f, 0.7f, 0);
 	glEnable(GL_DEPTH_TEST);
 
 	while (!glfwWindowShouldClose(window)) {
+		glUseProgram(shdr);
 
 
 		glfwPollEvents();
 		glfwSwapBuffers(window);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		
 	
 		scale = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
 		translate = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
@@ -1269,7 +1369,12 @@ int main() {
 		drawXAxis(x_axisVAO);
 		drawYAxis(y_axisVAO);
 		drawZAxis(z_axisVAO);
-		
+
+		glUseProgram(light_shder);
+		glUniformMatrix4fv(light_mm_addr, 1, false, glm::value_ptr(mm));
+		glUniformMatrix4fv(light_vm_addr, 1, false, glm::value_ptr(vm));
+		glUniformMatrix4fv(light_pm_addr, 1, false, glm::value_ptr(pm));//needed to make sure that they are initialized in the shader (i think?)
+		drawLamp(lampVAO);
 
 	}
 	return 0;
