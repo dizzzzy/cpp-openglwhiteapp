@@ -109,6 +109,7 @@ glm::mat4 hindLeftKneeMatrix;
 glm::mat4 translateBacktoOrigin;
 glm::mat4 jointTransformation;
 
+glm::vec2 worldRotation;
 
 
 GLuint loadShaders(std::string vertex_shader_path, std::string fragment_shader_path) {
@@ -209,6 +210,8 @@ GLuint loadShaders(std::string vertex_shader_path, std::string fragment_shader_p
 
 void update_view() {
 	vm = glm::lookAt(c_pos, c_pos + c_dir, c_up);
+	vm = glm::rotate(vm, glm::radians(worldRotation.x), glm::vec3(1, 0, 0));
+	vm = glm::rotate(vm, glm::radians(worldRotation.y), glm::vec3(0, 0, 1));
 	//vm = glm::lookAt(c_pos, center, c_up);
 }
 
@@ -434,6 +437,32 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 	if (key == GLFW_KEY_RIGHT) {
 		c_pos.x += 0.5;
+		update_view();
+	}
+
+	if (key == GLFW_KEY_H) {
+		worldRotation.x += 1;
+		update_view();
+	}
+
+	if (key == GLFW_KEY_N) {
+		worldRotation.x -= 1;
+		update_view();
+	}
+
+	if (key == GLFW_KEY_HOME) {
+		worldRotation.x =0;
+		worldRotation.y = 0;
+		update_view();
+	}
+
+	if (key == GLFW_KEY_B) {
+		worldRotation.y += 1;
+		update_view();
+	}
+
+	if (key == GLFW_KEY_M) {
+		worldRotation.y -= 1;
 		update_view();
 	}
 
@@ -1291,6 +1320,28 @@ GLuint loadTexture2(){
 	return texture2;
 }
 
+void loadDepthMap(){
+	const GLuint SHADOW_WIDTH = 1024, SHADOW_HEIGHT = 1024;
+	GLuint depthMapFBO;
+	glGenFramebuffers(1, &depthMapFBO);
+	// create depth texture
+	GLuint depthMap;
+	glGenTextures(1, &depthMap);
+	glBindTexture(GL_TEXTURE_2D, depthMap);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	float borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+	// attach depth texture as FBO's depth buffer
+	glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+	glDrawBuffer(GL_NONE);
+	glReadBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
 
 int main() {
 
@@ -1327,6 +1378,7 @@ int main() {
 	GLuint newGridVAO = initNewGrid();
 	GLuint texture1 = loadTexture1();
 	GLuint texture2 = loadTexture2();
+	loadDepthMap();
 	
 	glClearColor(0.7f, 0.7f, 0.7f, 0);
 	glEnable(GL_DEPTH_TEST);
@@ -1345,7 +1397,6 @@ int main() {
 		translate = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
 		rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.f), glm::vec3(0, 0, 1));
 		mm = translate * rotate * scale;
-
 		glUniformMatrix4fv(mm_addr, 1, false, glm::value_ptr(mm));
 		glUniformMatrix4fv(vm_addr, 1, false, glm::value_ptr(vm));
 		glUniformMatrix4fv(pm_addr, 1, false, glm::value_ptr(pm));//needed to make sure that they are initialized in the shader (i think?)
