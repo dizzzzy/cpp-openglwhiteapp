@@ -1314,7 +1314,9 @@ int main() {
 	light_pm_addr = glGetUniformLocation(light_shder, "p_m");
 
 	glUseProgram(shdr);
-	glUniform3f(glGetUniformLocation(shdr, "lightColor"),0.5, 0.5, 0.5);
+	glUniform3f(glGetUniformLocation(shdr, "lightColor"), 1.0, 1.0, 1.0);
+	glUniform3f(glGetUniformLocation(shdr, "lightPos"), l_pos.x, l_pos.y, l_pos.z);
+	glUniform3f(glGetUniformLocation(shdr, "viewPos"), c_pos.x, c_pos.y, c_pos.z);
 	//Component Initialization
 	GLuint cubeVAO = initCube();
 	GLuint lampVAO = initLamp();
