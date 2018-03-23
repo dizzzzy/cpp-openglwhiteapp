@@ -56,7 +56,7 @@ void main()
 			color = texture(texture1, TexCoord) * vec4((specular + ambient + diffuse) * vec3(0.647f, 0.165f, 0.165f), 1.0f);
 		}
 		if (fill == 7){
-			color = texture(texture2, TexCoord);
+			color = texture(texture2, TexCoord)* vec4((specular + ambient + diffuse),1.0f);
 		}
 	}else{
 	if (fill == 0) {

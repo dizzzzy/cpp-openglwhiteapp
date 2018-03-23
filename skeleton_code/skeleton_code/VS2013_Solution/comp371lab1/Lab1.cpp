@@ -803,13 +803,13 @@ GLuint initGrid(){
 GLuint initNewGrid(){
 	GLfloat grid_vertices[] =
 	{
-		-50.0f, 0, -50.0f, 0.0f, 0.0f,
-		50.0f, 0, -50.0f, 1.0f, 0.0f,
-		-50.0f, 0, 50.0f, 0.0f, 1.0f,
+		-50.0f, 0, -50.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+		50.0f, 0, -50.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+		-50.0f, 0, 50.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
 
-		50.0f, 0, -50.0f, 1.0f, 0.0f,
-		50.0f, 0, 50.0f, 1.0f, 1.0f,
-		-50.0f, 0, 50.0f, 0.0, 1.0f
+		50.0f, 0, -50.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+		50.0f, 0, 50.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+		-50.0f, 0, 50.0f, 0.0, 1.0f, 0.0f, 1.0f, 0.0f
 	};
 
 	GLuint VAO, VBO;
@@ -824,11 +824,14 @@ GLuint initNewGrid(){
 	/*glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0); original
 	glEnableVertexAttribArray(0);*/
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
+
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(5 * sizeof(GLfloat)));
+	glEnableVertexAttribArray(2);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
 
