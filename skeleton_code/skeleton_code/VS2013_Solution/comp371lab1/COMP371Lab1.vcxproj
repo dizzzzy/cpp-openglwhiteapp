@@ -117,6 +117,7 @@
     <ClInclude Include="Grid.h" />
     <ClInclude Include="Horse.h" />
     <ClInclude Include="LightShader.h" />
+    <ClInclude Include="NewGrid.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="stdafx.h" />
@@ -125,8 +126,9 @@
   <ItemGroup>
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="Horse.cpp" />
-    <ClCompile Include="Lab1.cpp" />
+    <ClCompile Include="Main.cpp" />
     <ClCompile Include="LightShader.cpp" />
+    <ClCompile Include="NewGrid.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="stdafx.cpp">
