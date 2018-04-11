@@ -21,6 +21,7 @@
 #include "NewGrid.h"
 #include "Axes.h"
 #include "Lamp.h"
+#include "Horse.h"
 
 Shader* shader;
 LightShader* lightShader;
@@ -402,15 +403,18 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 
 	if (key == GLFW_KEY_T && action == GLFW_PRESS) {
-		mode = 'T';
+		Horse::mode = 'T';
+		//mode = 'T';
 	}
 	
 	if (key == GLFW_KEY_P && action == GLFW_PRESS) {
-		mode = 'P';
+		Horse::mode = 'P';
+		//mode = 'P';
 	}
 
 	if (key == GLFW_KEY_L && action == GLFW_PRESS) {
-		mode = 'L';
+		Horse::mode = 'L';
+		//mode = 'L';
 	}
 
 	if (key == GLFW_KEY_SPACE && action == GLFW_PRESS) {
@@ -435,11 +439,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 }
 
 int init() {
-
+	
 	glfwInit();
-
+	//glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 	window = glfwCreateWindow(800, 800, "First window", nullptr, nullptr);
-
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetScrollCallback(window, scrollCallback);
 	glfwSetMouseButtonCallback(window, mouse_buttonCallback);
@@ -457,360 +460,6 @@ int init() {
 	}
 
 	return 0;
-}
-
-GLuint initCube(){
-	GLfloat cube_vertices[] = { // 1x1x1 cube centered at (0,0,0)
-		//position				//texture		//normal
-		-0.5f, -0.5f, -0.5f,	0.0f, 0.0f,		0.0f, 0.0f, -1.0f,
-		0.5f, -0.5f, -0.5f,		1.0f, 0.0f,		0.0f, 0.0f, -1.0f,
-		0.5f, 0.5f, -0.5f,		1.0f, 1.0f,		0.0f, 0.0f, -1.0f,
-		0.5f, 0.5f, -0.5f,		1.0f, 1.0f,		0.0f, 0.0f, -1.0f,
-		-0.5f, 0.5f, -0.5f,		0.0f, 1.0f,		0.0f, 0.0f, -1.0f,
-		-0.5f, -0.5f, -0.5f,	0.0f, 0.0f,		0.0f, 0.0f, -1.0f,
-
-		-0.5f, -0.5f, 0.5f,		0.0f, 0.0f,		0.0f,  0.0f,  1.0f,
-		0.5f, -0.5f, 0.5f,		1.0f, 0.0f,		0.0f,  0.0f,  1.0f,
-		0.5f, 0.5f, 0.5f,		1.0f, 1.0f,		0.0f,  0.0f,  1.0f,
-		0.5f, 0.5f, 0.5f,		1.0f, 1.0f,		0.0f,  0.0f,  1.0f,
-		-0.5f, 0.5f, 0.5f,		0.0f, 1.0f,		0.0f,  0.0f,  1.0f,
-		-0.5f, -0.5f, 0.5f,		0.0f, 0.0f,		0.0f,  0.0f,  1.0f,
-
-		-0.5f, 0.5f, 0.5f,		1.0f, 0.0f,		-1.0f,  0.0f,  0.0f,
-		-0.5f, 0.5f, -0.5f,		1.0f, 1.0f,		-1.0f,  0.0f,  0.0f,
-		-0.5f, -0.5f, -0.5f,	0.0f, 1.0f,		-1.0f,  0.0f,  0.0f,
-		-0.5f, -0.5f, -0.5f,	0.0f, 1.0f,		-1.0f,  0.0f,  0.0f,
-		-0.5f, -0.5f, 0.5f,		0.0f, 0.0f,		-1.0f,  0.0f,  0.0f,
-		-0.5f, 0.5f, 0.5f,		1.0f, 0.0f,		-1.0f,  0.0f,  0.0f,
-
-		0.5f, 0.5f, 0.5f,		1.0f, 0.0f,		1.0f,  0.0f,  0.0f,
-		0.5f, 0.5f, -0.5f,		1.0f, 1.0f,		1.0f,  0.0f,  0.0f,
-		0.5f, -0.5f, -0.5f,		0.0f, 1.0f,		1.0f,  0.0f,  0.0f,
-		0.5f, -0.5f, -0.5f,		0.0f, 1.0f,		1.0f,  0.0f,  0.0f,
-		0.5f, -0.5f, 0.5f,		0.0f, 0.0f,		1.0f,  0.0f,  0.0f,
-		0.5f, 0.5f, 0.5f,		1.0f, 0.0f,		1.0f,  0.0f,  0.0f,
-
-		-0.5f, -0.5f, -0.5f,	0.0f, 1.0f,		0.0f, -1.0f,  0.0f,
-		0.5f, -0.5f, -0.5f,		1.0f, 1.0f,		0.0f, -1.0f,  0.0f,
-		0.5f, -0.5f, 0.5f,		1.0f, 0.0f,		0.0f, -1.0f,  0.0f,
-		0.5f, -0.5f, 0.5f,		1.0f, 0.0f,		0.0f, -1.0f,  0.0f,
-		-0.5f, -0.5f, 0.5f,		0.0f, 0.0f,		0.0f, -1.0f,  0.0f,
-		-0.5f, -0.5f, -0.5f,	0.0f, 1.0f,		0.0f, -1.0f,  0.0f,
-
-		-0.5f, 0.5f, -0.5f,		0.0f, 1.0f,		0.0f,  1.0f,  0.0f,
-		0.5f, 0.5f, -0.5f,		1.0f, 1.0f,		0.0f,  1.0f,  0.0f,
-		0.5f, 0.5f, 0.5f,		1.0f, 0.0f,		0.0f,  1.0f,  0.0f,
-		0.5f, 0.5f, 0.5f,		1.0f, 0.0f,		0.0f,  1.0f,  0.0f,
-		-0.5f, 0.5f, 0.5f,		0.0f, 0.0f,		0.0f,  1.0f,  0.0f,
-		-0.5f, 0.5f, -0.5f,		0.0f, 1.0f,		0.0f,  1.0f,  0.0f
-	};
-
-	GLuint VAO, VBO;
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	// Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
-	glBindVertexArray(VAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(cube_vertices), cube_vertices, GL_STATIC_DRAW);
-
-	/*glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0); original
-	glEnableVertexAttribArray(0);*/
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
-	glEnableVertexAttribArray(0);
-
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(1);
-
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(5 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(2);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
-
-	glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs), remember: do NOT unbind the EBO, keep it bound to this VAO
-	
-	return VAO;
-}
-
-void drawObj(int vertexNum){
-	if (mode == 'T'){
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glDrawArrays(GL_TRIANGLES, 0, vertexNum);
-	}
-	else if (mode == 'P'){
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-		glDrawArrays(GL_POINTS, 0, vertexNum);
-	}
-	else if (mode == 'L'){
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glDrawArrays(GL_TRIANGLES, 0, vertexNum);
-	}
-}
-
-void drawCube(GLuint cubeVAO){
-	glm::mat4 rotateModMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.x), glm::vec3(1, 0, 0)); //rotate x
-	rotateModMatrix *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.y), glm::vec3(0, 1, 0)); //rotate y
-	rotateModMatrix *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.z), glm::vec3(0, 0, 1)); //rotate z
-	scale *= glm::scale(glm::mat4(1.0f), scaleMod);	//scaling modifications
-	glm::mat4 translateModMatrix = glm::translate(glm::mat4(1.0f), translateMod); //translation modification on all 3 axis
-	mm = jointTransformation * translateModMatrix * rotateModMatrix * translate * rotate * scale;
-	shader->setMm(mm);
-	glBindVertexArray(cubeVAO);
-	drawObj(36);
-	glBindVertexArray(0);
-}
-
-
-void drawBody(GLuint cubeVAO){  //torso
-	glm::vec3 body_pos = glm::vec3(0, body.y / 2 + leg.x * 2, 0) * scaleMod.x;
-	scale = glm::scale(glm::mat4(1.0f), glm::vec3( 5, 2, 2)); // 5 2 2
-	translate = glm::translate(glm::mat4(1.0f), body_pos);
-	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.f), glm::vec3(0, 0, 1));
-	shader->setFillLoc(0);
-	drawCube(cubeVAO);
-}
-
-void drawNeck(GLuint cubeVAO){
-	glm::vec3 neck_pos = glm::vec3(-0.55* body.x, 1.125*(body.y / 2 + leg.x * 2), 0) * scaleMod.x;
-	scale = glm::scale(glm::mat4(1.0f), glm::vec3(2, 1.25, 1.25));
-	//---------JOINT ROTATION------------
-	glm::mat4 jointRotation;
-	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(-1, 0, 0)); //translate joint down to (0,0,0)
-	jointRotation = glm::rotate(glm::mat4(1.0f), glm::radians(neckToTorso.x), glm::vec3(0, 0, 1)) * jointRotation;
-	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(1, 0, 0)) * jointRotation; //revert translation 
-	headToNeckMatrix = jointRotation;
-	//---------------------------------
-	
-	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(-45.0f), glm::vec3(0, 0, 1));// * jointRotation;
-	translate = glm::translate(glm::mat4(1.0f), neck_pos);
-
-	//---------JOINT OFFSET TRANSLATION------
-	glm::vec4 joint2Point(0.5, 0, 0, 1);
-
-	glm::mat4 rotateModMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.x), glm::vec3(1, 0, 0)); //rotate x
-	rotateModMatrix *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.y), glm::vec3(0, 1, 0)); //rotate y
-	rotateModMatrix *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.z), glm::vec3(0, 0, 1)); //rotate z
-	glm::mat4 tempScale = scale * glm::scale(glm::mat4(1.0f), scaleMod);	//scaling modifications
-	glm::mat4 translateModMatrix = glm::translate(glm::mat4(1.0f), translateMod); //translation modification on all 3 axis
-	mm = translateModMatrix * rotateModMatrix * translate * rotate * tempScale;
-	joint2Point = mm * joint2Point;
-	translateBacktoOrigin = glm::translate(glm::mat4(1.0f), glm::vec3(-joint2Point.x, -joint2Point.y, -joint2Point.z)); //translation modification on all 3 axis
-	glm::mat4 translateBacktoLocation = glm::translate(glm::mat4(1.0f), glm::vec3(joint2Point.x, joint2Point.y, joint2Point.z)); //translation modification on all 3 axis
-	jointTransformation = translateBacktoLocation * glm::rotate(glm::mat4(1.0f), glm::radians(neckToTorso.x), glm::vec3(0, 0, 1)) * translateBacktoOrigin; //translateBacktoLocation * 
-	//---------------------------------------
-
-	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.75, 4.5, 0));
-	shader->setFillLoc(5);
-	drawCube(cubeVAO);
-}
-
-void drawHead(GLuint cubeVAO){
-	glm::vec3 head_pos = glm::vec3(-0.75* body.x, 1.25*(body.y / 2 + leg.x * 2), 0) * scaleMod.x;
-	scale = glm::scale(glm::mat4(1.0f), glm::vec3(2, 1.25, 1.25));
-	rotate =  glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(0, 0, 1)); //headToNeck
-	//---------JOINT ROTATION------------
-	glm::mat4 jointRotation;
-	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(-0.75, 0, 0)); //translate joint down to (0,0,0)
-	jointRotation = glm::rotate(glm::mat4(1.0f), glm::radians(headToNeck.x), glm::vec3(0, 0, 1)) * jointRotation;
-	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0.75, 0, 0)) *jointRotation; //revert translation 
-	//---------------------------------
-	translate = glm::translate(glm::mat4(1.0f), head_pos) * jointRotation;
-	shader->setFillLoc(6);
-	drawCube(cubeVAO);
-}
-
-void drawFrontLeftUpperLeg(GLuint cubeVAO){
-	glm::vec3 leg_pos = glm::vec3(-0.5*(body.x - leg.y), 1.5*leg.x , 0.5*body.z - 0.5*leg.z) * scaleMod.x;
-	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5, 0.5, 0.5));
-	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0, 0, 1));
-	//---------JOINT ROTATION------------
-	glm::mat4 jointRotation;
-	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.75, 0)); //translate joint down to (0,0,0)
-	jointRotation = glm::rotate(glm::mat4(1.0f), glm::radians(torsoToFrontUpperLeftLeg.x), glm::vec3(0, 0, 1)) * jointRotation;
-	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.75, 0)) *jointRotation; //revert translation 
-	frontLeftKneeMatrix = jointRotation;
-	//---------------------------------
-	//---------JOINT OFFSET TRANSLATION------
-	glm::vec4 joint2Offset(0,-1.5,0,0);
-	glm::mat4 tempJointRotationMatrix;
-	tempJointRotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(torsoToFrontUpperLeftLeg.x), glm::vec3(0, 0, 1));
-	joint2Offset = tempJointRotationMatrix * joint2Offset;
-	joint2Offset = joint2Offset + glm::vec4(0, 1.5, 0, 0);
-	frontLeftKneeOffset.x = joint2Offset.x;
-	frontLeftKneeOffset.y = joint2Offset.y;
-	frontLeftKneeOffset.z = joint2Offset.z;
-	//---------------------------------------
-	translate = glm::translate(glm::mat4(1.0f), glm::vec3(leg_pos)) * jointRotation;
-	shader->setFillLoc(5);
-	drawCube(cubeVAO);
-}
-
-void drawFrontLeftLowerLeg(GLuint cubeVAO){
-	glm::vec3 leg_pos = glm::vec3(-0.5*(body.x - leg.y), 0.5*leg.x, 0.5*body.z - 0.5*leg.z) * scaleMod.x;
-	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5, 0.5, 0.5));
-	rotate = frontLeftKneeMatrix * glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0, 0, 1));
-	//---------JOINT ROTATION------------
-	glm::mat4 jointRotation;
-	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.75, 0)); //translate joint down to (0,0,0)
-	jointRotation = glm::rotate(glm::mat4(1.0f), glm::radians(frontLeftKnee.x), glm::vec3(0, 0, 1)) * jointRotation;
-	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.75, 0)) *jointRotation; //revert translation 
-	//---------------------------------
-	translate = glm::translate(glm::mat4(1.0f), leg_pos + frontLeftKneeOffset * scaleMod.x) * jointRotation; //+ frontLeftKneeOffset
-	shader->setFillLoc(6);
-	drawCube(cubeVAO);
-}
-
-void drawFrontRightUpperLeg(GLuint cubeVAO){
-	glm::vec3 leg_pos = glm::vec3(-0.5*(body.x - leg.y), 1.5*leg.x, -(0.5*body.z - 0.5*leg.z)) * scaleMod.x;
-	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5, 0.5, 0.5));
-	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0, 0, 1));
-
-	//---------JOINT ROTATION------------
-	glm::mat4 jointRotation;
-	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.75, 0)); //translate joint down to (0,0,0)
-	jointRotation = glm::rotate(glm::mat4(1.0f), glm::radians(torsoToFrontUpperRightLeg.x), glm::vec3(0, 0, 1)) * jointRotation;
-	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.75, 0)) *jointRotation; //revert translation 
-	frontRightKneeMatrix = jointRotation;
-	//---------------------------------
-	//---------JOINT OFFSET TRANSLATION------
-	glm::vec4 joint2Offset(0, -1.5, 0, 0);
-	glm::mat4 tempJointRotationMatrix;
-	tempJointRotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(torsoToFrontUpperRightLeg.x), glm::vec3(0, 0, 1));
-	joint2Offset = tempJointRotationMatrix * joint2Offset;
-	joint2Offset = joint2Offset + glm::vec4(0, 1.5, 0, 0);
-	frontRightKneeOffset.x = joint2Offset.x;
-	frontRightKneeOffset.y = joint2Offset.y;
-	frontRightKneeOffset.z = joint2Offset.z;
-	//---------------------------------------
-	translate = glm::translate(glm::mat4(1.0f), leg_pos) * jointRotation;
-	shader->setFillLoc(5);
-	drawCube(cubeVAO);
-}
-
-void drawFrontRightLowerLeg(GLuint cubeVAO){
-	glm::vec3 leg_pos = glm::vec3(-0.5*(body.x - leg.y), 0.5*leg.x, -(0.5*body.z - 0.5*leg.z)) * scaleMod.x;
-	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5, 0.5, 0.5));
-	rotate = frontRightKneeMatrix * glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0, 0, 1));
-	//---------JOINT ROTATION------------
-	glm::mat4 jointRotation;
-	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.75, 0)); //translate joint down to (0,0,0)
-	jointRotation = glm::rotate(glm::mat4(1.0f), glm::radians(frontRightKnee.x), glm::vec3(0, 0, 1)) * jointRotation;
-	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.75, 0)) *jointRotation; //revert translation 
-	//---------------------------------
-	translate = glm::translate(glm::mat4(1.0f), leg_pos + frontRightKneeOffset * scaleMod.x) * jointRotation;
-	shader->setFillLoc(6);
-	drawCube(cubeVAO);
-}
-
-void drawHindLeftUpperLeg(GLuint cubeVAO){
-	glm::vec3 leg_pos = glm::vec3(0.5*(body.x - leg.y), 1.5*leg.x, 0.5*body.z - 0.5*leg.z) * scaleMod.x;
-	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5, 0.5, 0.5));
-	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0, 0, 1));
-	//---------JOINT ROTATION------------
-	glm::mat4 jointRotation;
-	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.75, 0)); //translate joint down to (0,0,0)
-	jointRotation = glm::rotate(glm::mat4(1.0f), glm::radians(torsoToHindUpperLeftLeg.x), glm::vec3(0, 0, 1)) * jointRotation;
-	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.75, 0)) *jointRotation; //revert translation 
-	hindLeftKneeMatrix = jointRotation;
-	//---------------------------------
-	//---------JOINT OFFSET TRANSLATION------
-	glm::vec4 joint2Offset(0, -1.5, 0, 0);
-	glm::mat4 tempJointRotationMatrix;
-	tempJointRotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(torsoToHindUpperLeftLeg.x), glm::vec3(0, 0, 1));
-	joint2Offset = tempJointRotationMatrix * joint2Offset;
-	joint2Offset = joint2Offset + glm::vec4(0, 1.5, 0, 0);
-	hindLeftKneeOffset.x = joint2Offset.x;
-	hindLeftKneeOffset.y = joint2Offset.y;
-	hindLeftKneeOffset.z = joint2Offset.z;
-	//---------------------------------------
-	translate = glm::translate(glm::mat4(1.0f), leg_pos) * jointRotation;
-	shader->setFillLoc(5);
-	drawCube(cubeVAO);
-}
-
-void drawHindLeftLowerLeg(GLuint cubeVAO){
-	glm::vec3 leg_pos = glm::vec3(0.5*(body.x - leg.y), 0.5*leg.x, 0.5*body.z - 0.5*leg.z) * scaleMod.x;
-	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5, 0.5, 0.5));
-	rotate = hindLeftKneeMatrix * glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0, 0, 1));
-	//---------JOINT ROTATION------------
-	glm::mat4 jointRotation;
-	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.75, 0)); //translate joint down to (0,0,0)
-	jointRotation = glm::rotate(glm::mat4(1.0f), glm::radians(hindLeftKnee.x), glm::vec3(0, 0, 1)) * jointRotation;
-	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.75, 0)) *jointRotation; //revert translation 
-	//---------------------------------
-	translate = glm::translate(glm::mat4(1.0f), leg_pos + hindLeftKneeOffset * scaleMod.x) * jointRotation;
-	shader->setFillLoc(6);
-	drawCube(cubeVAO);
-}
-
-void drawHindRightUpperLeg(GLuint cubeVAO){
-	glm::vec3 leg_pos = glm::vec3(0.5*(body.x - leg.y), 1.5*leg.x, -(0.5*body.z - 0.5*leg.z)) * scaleMod.x;
-	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5, 0.5, 0.5));
-	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0, 0, 1));
-	//---------JOINT ROTATION------------
-	glm::mat4 jointRotation;
-	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.75, 0)); //translate joint down to (0,0,0)
-	jointRotation = glm::rotate(glm::mat4(1.0f), glm::radians(torsoToHindUpperRightLeg.x), glm::vec3(0, 0, 1)) * jointRotation;
-	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.75, 0)) *jointRotation; //revert translation 
-	hindRightKneeMatrix = jointRotation;
-	//---------------------------------
-	//---------JOINT OFFSET TRANSLATION------
-	glm::vec4 joint2Offset(0, -1.5, 0, 0);
-	glm::mat4 tempJointRotationMatrix;
-	tempJointRotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(torsoToHindUpperRightLeg.x), glm::vec3(0, 0, 1));
-	joint2Offset = tempJointRotationMatrix * joint2Offset;
-	joint2Offset = joint2Offset + glm::vec4(0, 1.5, 0, 0);
-	hindRightKneeOffset.x = joint2Offset.x;
-	hindRightKneeOffset.y = joint2Offset.y;
-	hindRightKneeOffset.z = joint2Offset.z;
-	//---------------------------------------
-	translate = glm::translate(glm::mat4(1.0f), leg_pos)* jointRotation;
-	shader->setFillLoc(5);
-	drawCube(cubeVAO);
-}
-
-void drawHindRightLowerLeg(GLuint cubeVAO){
-	glm::vec3 leg_pos = glm::vec3(0.5*(body.x - leg.y), 0.5*leg.x, -(0.5*body.z - 0.5*leg.z)) * scaleMod.x;
-	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1.5, 0.5, 0.5));
-	rotate = hindRightKneeMatrix * glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0, 0, 1));
-	//---------JOINT ROTATION------------
-	glm::mat4 jointRotation;
-	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, -0.75, 0)); //translate joint down to (0,0,0)
-	jointRotation = glm::rotate(glm::mat4(1.0f), glm::radians(hindRightKnee.x), glm::vec3(0, 0, 1)) * jointRotation;
-	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.75, 0)) *jointRotation; //revert translation 
-	//---------------------------------
-	translate = glm::translate(glm::mat4(1.0f), leg_pos + hindRightKneeOffset * scaleMod.x) * jointRotation;
-	shader->setFillLoc(6);
-	drawCube(cubeVAO);
-}
-
-void drawHorse(GLuint cubeVAO){
-	jointTransformation = glm::mat4(1.0f);
-	drawBody(cubeVAO);
-	jointTransformation = glm::mat4(1.0f);
-	drawNeck(cubeVAO);
-	drawHead(cubeVAO);
-	jointTransformation = glm::mat4(1.0f);
-	drawFrontLeftUpperLeg(cubeVAO);
-	drawFrontLeftLowerLeg(cubeVAO);
-	drawFrontRightUpperLeg(cubeVAO);
-	drawFrontRightLowerLeg(cubeVAO);
-
-	drawHindLeftUpperLeg(cubeVAO);
-	drawHindLeftLowerLeg(cubeVAO);
-
-	drawHindRightUpperLeg(cubeVAO);
-	drawHindRightLowerLeg(cubeVAO);
-}
-
-void resetModelMatrix(){
-	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
-	translate = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.f), glm::vec3(0, 0, 1));
-	mm = translate * rotate * scale;
-	shader->setMm(mm);
-
 }
 
 void loadDepthMap(){
@@ -855,13 +504,25 @@ int main() {
 	NewGrid newGrid;
 	Axes axes;
 	Lamp lamp;
+	//Horse horse;
+	std::vector<Horse*> horses;
+	for (int i = 0; i < 20; i++){
+		Horse* horse = new Horse(i);
+		horses.push_back(horse);
+	}
+	
 
 	//Component Initialization
 	grid.init();
 	newGrid.init();
 	axes.init();
 	lamp.init();
-	GLuint cubeVAO = initCube();
+	for (int i = 0; i < horses.size(); i++){
+		horses.at(i)->init();
+		horses.at(i)->setShader(shader);
+	}
+	/*horse.init();
+	horse.setShader(shader);*/
 	shader->loadTexture0("horse_skin.jpg");
 	shader->loadTexture1("grass.jpg");
 
@@ -878,12 +539,18 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		
-	
-		scale = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
-		translate = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
-		rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.f), glm::vec3(0, 0, 1));
-		mm = translate * rotate * scale;
-		shader->setMm(mm);
+		for (int i = 0; i < horses.size(); i++){
+			horses.at(i)->scale = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
+			horses.at(i)->translate = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+			horses.at(i)->rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.f), glm::vec3(0, 0, 1));
+			horses.at(i)->mm = translate * rotate * scale;
+		}
+		/*horse.scale = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1));
+		horse.translate = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
+		horse.rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.f), glm::vec3(0, 0, 1));
+		horse.mm = translate * rotate * scale;*/
+
+
 		shader->setVm(vm);
 		shader->setPm(pm);
 
@@ -897,27 +564,26 @@ int main() {
 
 
 			shader->activateTexture0();
-			drawHorse(cubeVAO);
+			for (int i = 0; i < horses.size(); i++){
+				horses.at(i)->draw();
+			}
 			shader->UnbindTexture();
 
 		}
 		else{
 			shader->setX(0);
 			grid.draw(shader);
-			drawHorse(cubeVAO);
+			for (int i = 0; i < horses.size(); i++){
+				horses.at(i)->draw();
+			}
 		}
 
-		resetModelMatrix();
 		axes.draw(shader);
 
 		lightShader->use();
 		lightShader->setVm(vm);
 		lightShader->setPm(pm);
-		glm::mat4 model = glm::mat4();
-		model = glm::translate(model, l_pos);
-		model = glm::scale(model, glm::vec3(0.2f));
-		lightShader->setMm(model);
-		lamp.draw(lightShader);
+		lamp.draw(lightShader, l_pos);
 
 
 	}

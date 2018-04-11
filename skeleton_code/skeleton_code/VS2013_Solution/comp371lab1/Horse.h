@@ -2,10 +2,18 @@
 #define HORSE_H
 #include <glm.hpp>
 #include <glew.h>
+#include "Shader.h"
 
 class Horse{
-	//----------CONSTRUCTOR------------
-	Horse(GLuint);
+public:
+	GLuint cubeVAO;
+	Shader* shader;
+	static char mode;
+	glm::mat4 translateBacktoOrigin;
+
+	//--------CONSTRUCTOR--------
+	Horse(int);
+
 
 	//------ MODEL MATRIX ---------
 	glm::mat4 mm;
@@ -60,19 +68,25 @@ class Horse{
 	glm::mat4 hindRightKneeMatrix;
 	glm::mat4 hindLeftKneeMatrix;
 
+	//-----------Bounding Sphere------------
+
+
+	void setShader(Shader*);
 	void drawObj(int vertexNum);
-	void drawCube(GLuint cubeVAO);
-	void drawBody(GLuint cubeVAO);
-	void drawNeck(GLuint cubeVAO);
-	void drawHead(GLuint cubeVAO);
-	void drawFrontLeftUpperLeg(GLuint cubeVAO);
-	void drawFrontLeftLowerLeg(GLuint cubeVAO);
-	void drawFrontRightUpperLeg(GLuint cubeVAO);
-	void drawFrontRightLowerLeg(GLuint cubeVAO);
-	void drawHindLeftUpperLeg(GLuint cubeVAO);
-	void drawHindLeftLowerLeg(GLuint cubeVAO);
-	void drawHindRightUpperLeg(GLuint cubeVAO);
-	void drawHindRightLowerLeg(GLuint cubeVAO);
+	void drawCube();
+	void drawBody();
+	void drawNeck();
+	void drawHead();
+	void drawFrontLeftUpperLeg();
+	void drawFrontLeftLowerLeg();
+	void drawFrontRightUpperLeg();
+	void drawFrontRightLowerLeg();
+	void drawHindLeftUpperLeg();
+	void drawHindLeftLowerLeg();
+	void drawHindRightUpperLeg();
+	void drawHindRightLowerLeg();
+	void drawBoundingSpehere();
+	void init();
 	void draw();
 	void run();
 	void walk();

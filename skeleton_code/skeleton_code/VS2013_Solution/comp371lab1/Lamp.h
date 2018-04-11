@@ -8,7 +8,7 @@ private:
 	GLuint VAO;
 public:
 	void init();
-	void draw(LightShader*);
+	void draw(LightShader*, const glm::vec3& );
 };
 
 #endif

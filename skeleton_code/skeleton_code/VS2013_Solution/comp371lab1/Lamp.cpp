@@ -72,8 +72,12 @@ void Lamp::init(){
 	glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs), remember: do NOT unbind the EBO, keep it bound to this VAO
 }
 
-void Lamp::draw(LightShader* shader){
+void Lamp::draw(LightShader* shader, const glm::vec3 & l_pos){
 	shader->use();
+	glm::mat4 model = glm::mat4();
+	model = glm::translate(model, l_pos);
+	model = glm::scale(model, glm::vec3(0.2f));
+	shader->setMm(model);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glBindVertexArray(this->VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
