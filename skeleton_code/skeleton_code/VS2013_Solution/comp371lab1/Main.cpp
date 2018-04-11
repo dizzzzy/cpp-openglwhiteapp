@@ -19,6 +19,7 @@
 #include "LightShader.h"
 #include "Grid.h"
 #include "NewGrid.h"
+#include "Axes.h"
 
 Shader* shader;
 LightShader* lightShader;
@@ -609,43 +610,6 @@ GLuint initZAxis(){
 	return VAO;
 }
 
-GLuint initNewGrid(){
-	GLfloat grid_vertices[] =
-	{
-		-50.0f, 0, -50.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-		50.0f, 0, -50.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-		-50.0f, 0, 50.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-
-		50.0f, 0, -50.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
-		50.0f, 0, 50.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-		-50.0f, 0, 50.0f, 0.0, 1.0f, 0.0f, 1.0f, 0.0f
-	};
-
-	GLuint VAO, VBO;
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	// Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
-	glBindVertexArray(VAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(grid_vertices), grid_vertices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
-	glEnableVertexAttribArray(0);
-
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(1);
-
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(5 * sizeof(GLfloat)));
-	glEnableVertexAttribArray(2);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
-
-	glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs), remember: do NOT unbind the EBO, keep it bound to this VAO
-
-	return VAO;
-}
-
 GLuint initLamp(){
 	GLfloat lamp_vertices[] = { // 1x1x1 cube centered at (0,0,0)
 		//position				//texture		//normal
@@ -773,14 +737,6 @@ void drawZAxis(GLuint axisVAO){
 	shader->setFillLoc(2);
 	glBindVertexArray(axisVAO);
 	glDrawArrays(GL_LINES, 0, 2);
-	glBindVertexArray(0);
-}
-
-void drawNewGrid(GLuint newGridVAO){
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	shader->setFillLoc(7);
-	glBindVertexArray(newGridVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
 }
 
@@ -1033,7 +989,6 @@ void resetModelMatrix(){
 	mm = translate * rotate * scale;
 	shader->setMm(mm);
 
-	//glUniformMatrix4fv(mm_addr, 1, false, glm::value_ptr(mm));
 }
 
 void loadDepthMap(){
@@ -1066,7 +1021,6 @@ int main() {
 	}
 
 	shader = new Shader("v.glsl", "f.glsl");
-
 	lightShader = new LightShader("v_lamp.glsl", "f_lamp.glsl");
 
 	shader->use();
@@ -1077,16 +1031,14 @@ int main() {
 	//Component Declaration
 	Grid grid;
 	NewGrid newGrid;
+	Axes axes;
 
 	//Component Initialization
 	grid.init();
 	newGrid.init();
+	axes.init();
 	GLuint cubeVAO = initCube();
 	GLuint lampVAO = initLamp();
-	GLuint x_axisVAO = initXAxis();
-	GLuint y_axisVAO = initYAxis();
-	GLuint z_axisVAO = initZAxis();
-	GLuint newGridVAO = initNewGrid();
 	shader->loadTexture0("horse_skin.jpg");
 	shader->loadTexture1("grass.jpg");
 
@@ -1118,7 +1070,6 @@ int main() {
 			
 			shader->activateTexture1();
 			newGrid.draw(shader);
-			//drawNewGrid(newGridVAO);
 			shader->UnbindTexture();
 
 
@@ -1134,10 +1085,7 @@ int main() {
 		}
 
 		resetModelMatrix();
-
-		drawXAxis(x_axisVAO);
-		drawYAxis(y_axisVAO);
-		drawZAxis(z_axisVAO);
+		axes.draw(shader);
 
 		lightShader->use();
 		lightShader->setVm(vm);

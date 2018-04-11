@@ -114,6 +114,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Axes.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="Horse.h" />
     <ClInclude Include="LightShader.h" />
@@ -124,6 +125,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Axes.cpp" />
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="Horse.cpp" />
     <ClCompile Include="Main.cpp" />
