@@ -6,8 +6,8 @@ in vec2 TexCoord;
 in vec3 Normal; 
 in vec3 FragPos;
 
+uniform sampler2D texture0;
 uniform sampler2D texture1;
-uniform sampler2D texture2;
 uniform int fill;
 uniform int shader_x_pressed;
 uniform vec3 lightColor;
@@ -31,7 +31,7 @@ void main()
 	//0 is ORANGE
 	if(shader_x_pressed == 1){
 		if (fill == 0) {
-			color = texture(texture1, TexCoord) * vec4((specular + ambient + diffuse) * vec3(1.000f, 0.647f, 0.000f), 1.0f);
+			color = texture(texture0, TexCoord) * vec4((specular + ambient + diffuse) * vec3(1.000f, 0.647f, 0.000f), 1.0f);
 		}
 		//1 is WHITE
 		if (fill == 1) {
@@ -50,13 +50,13 @@ void main()
 			color = vec4(0.0f, 0.0f, 1.0f, 1.0f);
 		}
 		if (fill == 5) {
-			color = texture(texture1, TexCoord) * vec4((specular + ambient + diffuse) * vec3(0.545f, 0.271f, 0.075f), 1.0f);
+			color = texture(texture0, TexCoord) * vec4((specular + ambient + diffuse) * vec3(0.545f, 0.271f, 0.075f), 1.0f);
 		}
 		if (fill == 6) {
-			color = texture(texture1, TexCoord) * vec4((specular + ambient + diffuse) * vec3(0.647f, 0.165f, 0.165f), 1.0f);
+			color = texture(texture0, TexCoord) * vec4((specular + ambient + diffuse) * vec3(0.647f, 0.165f, 0.165f), 1.0f);
 		}
 		if (fill == 7){
-			color = texture(texture2, TexCoord)* vec4((specular + ambient + diffuse),1.0f);
+			color = texture(texture1, TexCoord)* vec4((specular + ambient + diffuse),1.0f);
 		}
 	}else{
 	if (fill == 0) {
@@ -85,7 +85,7 @@ void main()
 			color = vec4((specular + ambient + diffuse) * vec3(0.647f, 0.165f, 0.165f), 1.0f);
 		}
 		if (fill == 7){
-			color = texture(texture2, TexCoord);
+			color = texture(texture1, TexCoord);
 		}
 	}
 	

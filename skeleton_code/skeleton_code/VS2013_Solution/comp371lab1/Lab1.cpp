@@ -3,7 +3,7 @@
 //#define GLM_ENABLE_EXPERIMENTAL
 #include "stdafx.h"
 #include "stb_image.h"
-#include <glm.hpp>
+//#include <glm.hpp>
 #include "gtc/matrix_transform.hpp"
 #include "gtc/type_ptr.hpp"
 #include <glew.h>
@@ -14,30 +14,23 @@
 #include <sstream>
 #include <fstream>
 
+//Component Includes
+#include "Shader.h"
+#include "LightShader.h"
+#include "Grid.h"
 
-GLuint shdr;
-GLuint light_shder;
+Shader* shader;
+LightShader* lightShader;
 
 GLFWwindow* window;
 
-GLuint mm_addr;
-GLuint vm_addr;
-GLuint pm_addr;
-GLuint fillLoc;
-GLuint shader_x_pressed;
 
 
-GLuint light_mm_addr;
-GLuint light_vm_addr;
-GLuint light_pm_addr;
-
-
+glm::vec3 lightColor(1.0);
 glm::vec3 l_pos = glm::vec3(0, 20, 0);
 glm::vec3 c_pos = glm::vec3(0, 0, 3);
 glm::vec3 c_dir = glm::normalize(glm::vec3(0, 0, -3));
 glm::vec3 center = glm::vec3(0, 0, 0); //were locking what the camera is looking at.
-//glm::vec3 c_pos = glm::vec3(0, 0, 3);
-//glm::vec3 c_dir = glm::normalize(glm::vec3(0, 0, 0));
 glm::vec3 c_up = glm::vec3(0, 1, 0);
 
 //------ MODEL MATRIX ---------
@@ -112,107 +105,10 @@ glm::mat4 jointTransformation;
 glm::vec2 worldRotation;
 
 
-GLuint loadShaders(std::string vertex_shader_path, std::string fragment_shader_path) {
-
-	// Create the shaders
-	GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
-	GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
-
-	// Read the Vertex Shader code from the file
-	std::string VertexShaderCode;
-	std::ifstream VertexShaderStream(vertex_shader_path, std::ios::in);
-
-	if (VertexShaderStream.is_open()) {
-		std::string Line = "";
-		while (getline(VertexShaderStream, Line))
-			VertexShaderCode += "\n" + Line;
-		VertexShaderStream.close();
-	}
-	else {
-		printf("Impossible to open %s. Are you in the right directory ?\n", vertex_shader_path.c_str());
-		getchar();
-		exit(-1);
-	}
-
-	// Read the Fragment Shader code from the file
-	std::string FragmentShaderCode;
-	std::ifstream FragmentShaderStream(fragment_shader_path, std::ios::in);
-
-	if (FragmentShaderStream.is_open()) {
-		std::string Line = "";
-		while (getline(FragmentShaderStream, Line))
-			FragmentShaderCode += "\n" + Line;
-		FragmentShaderStream.close();
-	}
-	else {
-		printf("Impossible to open %s. Are you in the right directory ?\n", fragment_shader_path.c_str());
-		getchar();
-		exit(-1);
-	}
-
-	GLint Result = GL_FALSE;
-	int InfoLogLength;
-
-	// Compile Vertex Shader
-	printf("Compiling shader : %s\n", vertex_shader_path.c_str());
-	char const * VertexSourcePointer = VertexShaderCode.c_str();
-	glShaderSource(VertexShaderID, 1, &VertexSourcePointer, nullptr);
-	glCompileShader(VertexShaderID);
-
-	// Check Vertex Shader
-	glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &Result);
-	glGetShaderiv(VertexShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-	if (InfoLogLength > 0) {
-		std::vector<char> VertexShaderErrorMessage(InfoLogLength + 1);
-		glGetShaderInfoLog(VertexShaderID, InfoLogLength, nullptr, &VertexShaderErrorMessage[0]);
-		printf("%s\n", &VertexShaderErrorMessage[0]);
-	}
-
-	// Compile Fragment Shader
-	printf("Compiling shader : %s\n", fragment_shader_path.c_str());
-	char const * FragmentSourcePointer = FragmentShaderCode.c_str();
-	glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer, nullptr);
-	glCompileShader(FragmentShaderID);
-
-	// Check Fragment Shader
-	glGetShaderiv(FragmentShaderID, GL_COMPILE_STATUS, &Result);
-	glGetShaderiv(FragmentShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-	if (InfoLogLength > 0) {
-		std::vector<char> FragmentShaderErrorMessage(InfoLogLength + 1);
-		glGetShaderInfoLog(FragmentShaderID, InfoLogLength, nullptr, &FragmentShaderErrorMessage[0]);
-		printf("%s\n", &FragmentShaderErrorMessage[0]);
-	}
-
-	// Link the program
-	printf("Linking program\n");
-	GLuint ProgramID = glCreateProgram();
-	glAttachShader(ProgramID, VertexShaderID);
-	glAttachShader(ProgramID, FragmentShaderID);
-
-	glBindAttribLocation(ProgramID, 0, "in_Position");
-
-	glLinkProgram(ProgramID);
-
-	// Check the program
-	glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
-	glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-	if (InfoLogLength > 0) {
-		std::vector<char> ProgramErrorMessage(InfoLogLength + 1);
-		glGetProgramInfoLog(ProgramID, InfoLogLength, nullptr, &ProgramErrorMessage[0]);
-		printf("%s\n", &ProgramErrorMessage[0]);
-	}
-
-	glDeleteShader(VertexShaderID); //free up memory
-	glDeleteShader(FragmentShaderID);
-
-	return ProgramID;
-}
-
 void update_view() {
 	vm = glm::lookAt(c_pos, c_pos + c_dir, c_up);
 	vm = glm::rotate(vm, glm::radians(worldRotation.x), glm::vec3(1, 0, 0));
 	vm = glm::rotate(vm, glm::radians(worldRotation.y), glm::vec3(0, 0, 1));
-	//vm = glm::lookAt(c_pos, center, c_up);
 }
 
 void scrollCallback(GLFWwindow* window, double xOffset, double yOffset){
@@ -562,47 +458,6 @@ int init() {
 
 GLuint initCube(){
 	GLfloat cube_vertices[] = { // 1x1x1 cube centered at (0,0,0)
-		/*-0.5f, -0.5f, -0.5f, original
-		-0.5f, -0.5f, 0.5f,
-		-0.5f, 0.5f, 0.5f,
-		0.5f, 0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, 0.5f, -0.5f,
-
-		0.5f, -0.5f, 0.5f,
-		-0.5f, -0.5f, -0.5f,
-		0.5f, -0.5f, -0.5f,
-		0.5f, 0.5f, -0.5f,
-		0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, 0.5f, 0.5f,
-		-0.5f, 0.5f, -0.5f,
-		0.5f, -0.5f, 0.5f,
-		-0.5f, -0.5f, 0.5f,
-		-0.5f, -0.5f, -0.5f,
-
-		-0.5f, 0.5f, 0.5f,
-		-0.5f, -0.5f, 0.5f,
-		0.5f, -0.5f, 0.5f,
-		0.5f, 0.5f, 0.5f,
-		0.5f, -0.5f, -0.5f,
-		0.5f, 0.5f, -0.5f,
-
-		0.5f, -0.5f, -0.5f,
-		0.5f, 0.5f, 0.5f,
-		0.5f, -0.5f, 0.5f,
-		0.5f, 0.5f, 0.5f,
-		0.5f, 0.5f, -0.5f,
-		-0.5f, 0.5f, -0.5f,
-
-		0.5f, 0.5f, 0.5f,
-		-0.5f, 0.5f, -0.5f,
-		-0.5f, 0.5f, 0.5f,
-		0.5f, 0.5f, 0.5f,
-		-0.5f, 0.5f, 0.5f,
-		0.5f, -0.5f, 0.5f*/
 		//position				//texture		//normal
 		-0.5f, -0.5f, -0.5f,	0.0f, 0.0f,		0.0f, 0.0f, -1.0f,
 		0.5f, -0.5f, -0.5f,		1.0f, 0.0f,		0.0f, 0.0f, -1.0f,
@@ -753,53 +608,6 @@ GLuint initZAxis(){
 	return VAO;
 }
 
-GLuint initGrid(){
-	//Set grid vertices
-	GLfloat grid_vertices[1212];
-	int current_row = 0;
-	GLfloat temp_coordinate = -50.0f;
-	for (int i = 0; i < 1212; i += 12, temp_coordinate += 1.0f){
-		//point 1 of the square
-		grid_vertices[i] = temp_coordinate;
-		grid_vertices[i + 1] = 0.0f;
-		grid_vertices[i + 2] = -50.0f;
-	
-		//point 2 of the line
-		grid_vertices[i + 3] = temp_coordinate;
-		grid_vertices[i + 4] = 0.0f;
-		grid_vertices[i + 5] = 50.0f;
-	
-		//point 1 of the 2nd line     
-		grid_vertices[i + 6] = -50.0f;
-		grid_vertices[i + 7] = 0.0f;
-		grid_vertices[i + 8] = temp_coordinate;
-	
-		//point 2 of the 2nd line
-		grid_vertices[i + 9] = 50.0f;
-		grid_vertices[i + 10] = 0.0f;
-		grid_vertices[i + 11] = temp_coordinate;
-	}
-
-
-	GLuint VAO, VBO;
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	// Bind the Vertex Array Object first, then bind and set vertex buffer(s) and attribute pointer(s).
-	glBindVertexArray(VAO);
-
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(grid_vertices), grid_vertices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
-	glEnableVertexAttribArray(0);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
-
-	glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs), remember: do NOT unbind the EBO, keep it bound to this VAO
-
-	return VAO;
-}
-
 GLuint initNewGrid(){
 	GLfloat grid_vertices[] =
 	{
@@ -821,9 +629,6 @@ GLuint initNewGrid(){
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(grid_vertices), grid_vertices, GL_STATIC_DRAW);
 
-	/*glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0); original
-	glEnableVertexAttribArray(0);*/
-
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
 
@@ -836,9 +641,6 @@ GLuint initNewGrid(){
 	glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
 
 	glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs), remember: do NOT unbind the EBO, keep it bound to this VAO
-
-
-	
 
 	return VAO;
 }
@@ -940,55 +742,42 @@ void drawObj(int vertexNum){
 }
 
 void drawCube(GLuint cubeVAO){
-	//rotate *= glm::rotate(glm::mat4(1.0f), 0.f, glm::vec3(1, 0, 0)); //rotation modification around x
-	//rotate *= glm::rotate(glm::mat4(1.0f), 0.0f, glm::vec3(0, 1, 0)); //rotation modification around y
-	//rotate *= glm::rotate(glm::mat4(1.0f), 0.0f, glm::vec3(0, 0, 1)); //rotation modification around z
-	//scale *= glm::scale(glm::mat4(1.0f), scaleMod);	//scaling modifications
-	//translate *= glm::translate(glm::mat4(1.0f), translateMod); //translation modification on all 3 axis
 	glm::mat4 rotateModMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.x), glm::vec3(1, 0, 0)); //rotate x
 	rotateModMatrix *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.y), glm::vec3(0, 1, 0)); //rotate y
 	rotateModMatrix *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.z), glm::vec3(0, 0, 1)); //rotate z
-	//glm::mat4 scaleModMatrix = glm::scale(glm::mat4(1.0f), scaleMod);
 	scale *= glm::scale(glm::mat4(1.0f), scaleMod);	//scaling modifications
 	glm::mat4 translateModMatrix = glm::translate(glm::mat4(1.0f), translateMod); //translation modification on all 3 axis
 	mm = jointTransformation * translateModMatrix * rotateModMatrix * translate * rotate * scale;
-	glUniformMatrix4fv(mm_addr, 1, false, glm::value_ptr(mm));
+	shader->setMm(mm);
 	glBindVertexArray(cubeVAO);
 	drawObj(36);
 	glBindVertexArray(0);
 }
 
 void drawXAxis(GLuint axisVAO){
-	glUniform1i(fillLoc, 3);
+	shader->setFillLoc(3);
 	glBindVertexArray(axisVAO);
 	glDrawArrays(GL_LINES, 0, 2);
 	glBindVertexArray(0);
 }
 
 void drawYAxis(GLuint axisVAO){
-	glUniform1i(fillLoc, 4);
+	shader->setFillLoc(4);
 	glBindVertexArray(axisVAO);
 	glDrawArrays(GL_LINES, 0, 2);
 	glBindVertexArray(0);
 }
 
 void drawZAxis(GLuint axisVAO){
-	glUniform1i(fillLoc, 2);
+	shader->setFillLoc(2);
 	glBindVertexArray(axisVAO);
 	glDrawArrays(GL_LINES, 0, 2);
 	glBindVertexArray(0);
 }
 
-void drawGrid(GLuint gridVAO){
-	glUniform1i(fillLoc, 1);
-	glBindVertexArray(gridVAO);
-	glDrawArrays(GL_LINES, 0, 202 * 2);
-	glBindVertexArray(0);
-}
-
 void drawNewGrid(GLuint newGridVAO){
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glUniform1i(fillLoc, 7);
+	shader->setFillLoc(7);
 	glBindVertexArray(newGridVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
@@ -998,9 +787,8 @@ void drawBody(GLuint cubeVAO){  //torso
 	glm::vec3 body_pos = glm::vec3(0, body.y / 2 + leg.x * 2, 0) * scaleMod.x;
 	scale = glm::scale(glm::mat4(1.0f), glm::vec3( 5, 2, 2)); // 5 2 2
 	translate = glm::translate(glm::mat4(1.0f), body_pos);
-	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(0, 4, 0));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.f), glm::vec3(0, 0, 1));
-	glUniform1i(fillLoc, 0);
+	shader->setFillLoc(0);
 	drawCube(cubeVAO);
 }
 
@@ -1024,7 +812,6 @@ void drawNeck(GLuint cubeVAO){
 	glm::mat4 rotateModMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.x), glm::vec3(1, 0, 0)); //rotate x
 	rotateModMatrix *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.y), glm::vec3(0, 1, 0)); //rotate y
 	rotateModMatrix *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.z), glm::vec3(0, 0, 1)); //rotate z
-	//glm::mat4 scaleModMatrix = glm::scale(glm::mat4(1.0f), scaleMod);
 	glm::mat4 tempScale = scale * glm::scale(glm::mat4(1.0f), scaleMod);	//scaling modifications
 	glm::mat4 translateModMatrix = glm::translate(glm::mat4(1.0f), translateMod); //translation modification on all 3 axis
 	mm = translateModMatrix * rotateModMatrix * translate * rotate * tempScale;
@@ -1035,7 +822,7 @@ void drawNeck(GLuint cubeVAO){
 	//---------------------------------------
 
 	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.75, 4.5, 0));
-	glUniform1i(fillLoc, 5);
+	shader->setFillLoc(5);
 	drawCube(cubeVAO);
 }
 
@@ -1050,8 +837,7 @@ void drawHead(GLuint cubeVAO){
 	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0.75, 0, 0)) *jointRotation; //revert translation 
 	//---------------------------------
 	translate = glm::translate(glm::mat4(1.0f), head_pos) * jointRotation;
-	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(-3.75, 5, 0)* scaleMod.x) ;
-	glUniform1i(fillLoc, 6);
+	shader->setFillLoc(6);
 	drawCube(cubeVAO);
 }
 
@@ -1076,9 +862,8 @@ void drawFrontLeftUpperLeg(GLuint cubeVAO){
 	frontLeftKneeOffset.y = joint2Offset.y;
 	frontLeftKneeOffset.z = joint2Offset.z;
 	//---------------------------------------
-	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.25, 2.25, 0.75));
 	translate = glm::translate(glm::mat4(1.0f), glm::vec3(leg_pos)) * jointRotation;
-	glUniform1i(fillLoc, 5);
+	shader->setFillLoc(5);
 	drawCube(cubeVAO);
 }
 
@@ -1093,8 +878,7 @@ void drawFrontLeftLowerLeg(GLuint cubeVAO){
 	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.75, 0)) *jointRotation; //revert translation 
 	//---------------------------------
 	translate = glm::translate(glm::mat4(1.0f), leg_pos + frontLeftKneeOffset * scaleMod.x) * jointRotation; //+ frontLeftKneeOffset
-	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.25, 0.75, 0.75));
-	glUniform1i(fillLoc, 6);
+	shader->setFillLoc(6);
 	drawCube(cubeVAO);
 }
 
@@ -1120,9 +904,8 @@ void drawFrontRightUpperLeg(GLuint cubeVAO){
 	frontRightKneeOffset.y = joint2Offset.y;
 	frontRightKneeOffset.z = joint2Offset.z;
 	//---------------------------------------
-	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.25, 2.25, -0.75));
 	translate = glm::translate(glm::mat4(1.0f), leg_pos) * jointRotation;
-	glUniform1i(fillLoc, 5);
+	shader->setFillLoc(5);
 	drawCube(cubeVAO);
 }
 
@@ -1136,9 +919,8 @@ void drawFrontRightLowerLeg(GLuint cubeVAO){
 	jointRotation = glm::rotate(glm::mat4(1.0f), glm::radians(frontRightKnee.x), glm::vec3(0, 0, 1)) * jointRotation;
 	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.75, 0)) *jointRotation; //revert translation 
 	//---------------------------------
-//	translate = glm::translate(glm::mat4(1.0f), glm::vec3(-2.25, 0.75, -0.75));
 	translate = glm::translate(glm::mat4(1.0f), leg_pos + frontRightKneeOffset * scaleMod.x) * jointRotation;
-	glUniform1i(fillLoc, 6);
+	shader->setFillLoc(6);
 	drawCube(cubeVAO);
 }
 
@@ -1164,8 +946,7 @@ void drawHindLeftUpperLeg(GLuint cubeVAO){
 	hindLeftKneeOffset.z = joint2Offset.z;
 	//---------------------------------------
 	translate = glm::translate(glm::mat4(1.0f), leg_pos) * jointRotation;
-	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(2.25, 2.25, 0.75));
-	glUniform1i(fillLoc, 5);
+	shader->setFillLoc(5);
 	drawCube(cubeVAO);
 }
 
@@ -1180,8 +961,7 @@ void drawHindLeftLowerLeg(GLuint cubeVAO){
 	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.75, 0)) *jointRotation; //revert translation 
 	//---------------------------------
 	translate = glm::translate(glm::mat4(1.0f), leg_pos + hindLeftKneeOffset * scaleMod.x) * jointRotation;
-	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(2.25, 0.75, 0.75));
-	glUniform1i(fillLoc, 6);
+	shader->setFillLoc(6);
 	drawCube(cubeVAO);
 }
 
@@ -1207,8 +987,7 @@ void drawHindRightUpperLeg(GLuint cubeVAO){
 	hindRightKneeOffset.z = joint2Offset.z;
 	//---------------------------------------
 	translate = glm::translate(glm::mat4(1.0f), leg_pos)* jointRotation;
-	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(2.25, 2.25, -0.75));
-	glUniform1i(fillLoc, 5);
+	shader->setFillLoc(5);
 	drawCube(cubeVAO);
 }
 
@@ -1223,8 +1002,7 @@ void drawHindRightLowerLeg(GLuint cubeVAO){
 	jointRotation = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.75, 0)) *jointRotation; //revert translation 
 	//---------------------------------
 	translate = glm::translate(glm::mat4(1.0f), leg_pos + hindRightKneeOffset * scaleMod.x) * jointRotation;
-	//translate = glm::translate(glm::mat4(1.0f), glm::vec3(2.25, 0.75, -0.75));
-	glUniform1i(fillLoc, 6);
+	shader->setFillLoc(6);
 	drawCube(cubeVAO);
 }
 
@@ -1252,75 +1030,9 @@ void resetModelMatrix(){
 	translate = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.f), glm::vec3(0, 0, 1));
 	mm = translate * rotate * scale;
-	glUniformMatrix4fv(mm_addr, 1, false, glm::value_ptr(mm));
-}
+	shader->setMm(mm);
 
-GLuint loadTexture1(){
-	// load and create a texture 
-	// -------------------------
-	GLuint texture1;
-	// texture 1
-	// ---------
-	glGenTextures(1, &texture1);
-	glBindTexture(GL_TEXTURE_2D, texture1);
-	// set the texture wrapping parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	// set texture filtering parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// load image, create texture and generate mipmaps
-	int width, height, nrChannels;
-	stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-	unsigned char *data = stbi_load("horse_skin.jpg", &width, &height, &nrChannels, 0); //"" container.jpg
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "Failed to load texture" << std::endl;
-		getchar();
-	}
-	stbi_image_free(data);
-
-	glUniform1i(glGetUniformLocation(shdr, "texture1"), 0);
-	return texture1;
-}
-
-GLuint loadTexture2(){
-	// load and create a texture 
-	// -------------------------
-	GLuint texture2;
-	// texture 1
-	// ---------
-	glGenTextures(1, &texture2);
-	glBindTexture(GL_TEXTURE_2D, texture2);
-	// set the texture wrapping parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	// set texture filtering parameters
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	// load image, create texture and generate mipmaps
-	int width, height, nrChannels;
-	stbi_set_flip_vertically_on_load(true); // tell stb_image.h to flip loaded texture's on the y-axis.
-	unsigned char *data = stbi_load("grass.jpg", &width, &height, &nrChannels, 0); //"" container.jpg
-	if (data)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "Failed to load texture" << std::endl;
-		getchar();
-	}
-	stbi_image_free(data);
-
-	glUniform1i(glGetUniformLocation(shdr, "texture2"), 1);
-	return texture2;
+	//glUniformMatrix4fv(mm_addr, 1, false, glm::value_ptr(mm));
 }
 
 void loadDepthMap(){
@@ -1352,43 +1064,36 @@ int main() {
 		return -1;
 	}
 
-	shdr = loadShaders("v.glsl", "f.glsl");
-	light_shder = loadShaders("v_lamp.glsl", "f_lamp.glsl");
-	
-	glUseProgram(shdr);
-	mm_addr = glGetUniformLocation(shdr, "m_m");
-	vm_addr = glGetUniformLocation(shdr, "v_m");
-	pm_addr = glGetUniformLocation(shdr, "p_m");
-	fillLoc = glGetUniformLocation(shdr, "fill");
-	shader_x_pressed = glGetUniformLocation(shdr, "shader_x_pressed");
+	shader = new Shader("v.glsl", "f.glsl");
 
-	glUseProgram(light_shder);
-	light_mm_addr = glGetUniformLocation(light_shder, "m_m");
-	light_vm_addr = glGetUniformLocation(light_shder, "v_m");
-	light_pm_addr = glGetUniformLocation(light_shder, "p_m");
+	lightShader = new LightShader("v_lamp.glsl", "f_lamp.glsl");
 
-	glUseProgram(shdr);
-	glUniform3f(glGetUniformLocation(shdr, "lightColor"), 1.0, 1.0, 1.0);
-	glUniform3f(glGetUniformLocation(shdr, "lightPos"), l_pos.x, l_pos.y, l_pos.z);
-	glUniform3f(glGetUniformLocation(shdr, "viewPos"), c_pos.x, c_pos.y, c_pos.z);
+	shader->use();
+	shader->setLightColor(lightColor);
+	shader->setLightPos(l_pos);
+	shader->setViewPos(c_pos);
+
+	//Component Declaration
+	Grid grid;
+
 	//Component Initialization
+	grid.init();
 	GLuint cubeVAO = initCube();
 	GLuint lampVAO = initLamp();
 	GLuint x_axisVAO = initXAxis();
 	GLuint y_axisVAO = initYAxis();
 	GLuint z_axisVAO = initZAxis();
-	GLuint gridVAO = initGrid();
 	GLuint newGridVAO = initNewGrid();
-	GLuint texture1 = loadTexture1();
-	GLuint texture2 = loadTexture2();
+	shader->loadTexture0("horse_skin.jpg");
+	shader->loadTexture1("grass.jpg");
+
 	loadDepthMap();
 	
 	glClearColor(0.7f, 0.7f, 0.7f, 0);
 	glEnable(GL_DEPTH_TEST);
 
 	while (!glfwWindowShouldClose(window)) {
-		glUseProgram(shdr);
-
+		shader->use();
 
 		glfwPollEvents();
 		glfwSwapBuffers(window);
@@ -1400,25 +1105,27 @@ int main() {
 		translate = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, 0));
 		rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.f), glm::vec3(0, 0, 1));
 		mm = translate * rotate * scale;
-		glUniformMatrix4fv(mm_addr, 1, false, glm::value_ptr(mm));
-		glUniformMatrix4fv(vm_addr, 1, false, glm::value_ptr(vm));
-		glUniformMatrix4fv(pm_addr, 1, false, glm::value_ptr(pm));//needed to make sure that they are initialized in the shader (i think?)
-		if (x_pressed){
-			glUniform1i(shader_x_pressed, 1);
-			//load textures and new grid
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, texture2);
-			drawNewGrid(newGridVAO);
-			glBindTexture(GL_TEXTURE_2D, 0);
+		shader->setMm(mm);
+		shader->setVm(vm);
+		shader->setPm(pm);
 
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, texture1);
+		if (x_pressed){
+			shader->setX(1);
+
+			
+			shader->activateTexture1();
+			drawNewGrid(newGridVAO);
+			shader->UnbindTexture();
+
+
+			shader->activateTexture0();
 			drawHorse(cubeVAO);
-			glBindTexture(GL_TEXTURE_2D, 0);
+			shader->UnbindTexture();
+
 		}
 		else{
-			glUniform1i(shader_x_pressed, 0);
-			drawGrid(gridVAO);
+			shader->setX(0);
+			grid.draw(shader);
 			drawHorse(cubeVAO);
 		}
 
@@ -1428,16 +1135,22 @@ int main() {
 		drawYAxis(y_axisVAO);
 		drawZAxis(z_axisVAO);
 
-		glUseProgram(light_shder);
-		glUniformMatrix4fv(light_vm_addr, 1, false, glm::value_ptr(vm));
-		glUniformMatrix4fv(light_pm_addr, 1, false, glm::value_ptr(pm));//needed to make sure that they are initialized in the shader (i think?)
+		lightShader->use();
+		lightShader->setVm(vm);
+		lightShader->setPm(pm);
 		glm::mat4 model = glm::mat4();
 		model = glm::translate(model, l_pos);
 		model = glm::scale(model, glm::vec3(0.2f));
-		glUniformMatrix4fv(light_mm_addr, 1, false, glm::value_ptr(model));
+		lightShader->setMm(model);
 		drawLamp(lampVAO);
 
 	}
 	return 0;
 }
 
+//Need to load 20 horses
+	//I can instance them 
+		//how would i handle movements?
+			//i would have to make a seperate model for my each horse
+			//the movemetns have to be a vector connected a 
+	//I can do a for loop and launch a 
