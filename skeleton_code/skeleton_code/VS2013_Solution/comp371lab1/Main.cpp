@@ -583,15 +583,13 @@ int main() {
 							horses.at(i)->collided = true;
 							horses.at(j)->collided = true;
 						}
-						/*else{
-							horses.at(i)->collided = false;
-							horses.at(j)->collided = false;
-						}*/
 					}
 				}
 			}
 			for (int i = 0; i < horses.size(); i++){
 				horses.at(i)->draw();
+				//reset collision 
+				horses.at(i)->collided = false;
 			}
 			//horse.draw();
 		}
