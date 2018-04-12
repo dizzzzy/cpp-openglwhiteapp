@@ -115,24 +115,31 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Axes.h" />
+    <ClInclude Include="Capsule.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="Horse.h" />
     <ClInclude Include="Lamp.h" />
     <ClInclude Include="LightShader.h" />
     <ClInclude Include="NewGrid.h" />
+    <ClInclude Include="Point.h" />
+    <ClInclude Include="Segment.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Axes.cpp" />
+    <ClCompile Include="Capsule.cpp" />
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="Horse.cpp" />
     <ClCompile Include="Lamp.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="LightShader.cpp" />
     <ClCompile Include="NewGrid.cpp" />
+    <ClCompile Include="Point.cpp" />
+    <ClCompile Include="Segment.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -141,6 +148,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Vector.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

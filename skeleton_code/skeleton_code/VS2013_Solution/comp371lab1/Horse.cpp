@@ -6,12 +6,16 @@
 
 char Horse::mode = 'L'; 
 
+Horse::Horse(){
+}
+
 Horse::Horse(int i){
-	srand(i);
-	int random = rand() % 30 - 30;
+	srand((i*8)^2);
+	//srand(time(NULL));
+	int random = rand() % 100 + (-49);
 	translateMod.z = random;
-	srand(i + rand());
-	int rand2 = rand() % 50 - 50;
+	srand(rand()+ i*8);
+	int rand2 = rand() % 100 + (-49);
 	translateMod.x = rand2;
 }
 
@@ -266,21 +270,71 @@ void Horse::drawHindRightLowerLeg(){
 	drawCube();
 }
 
-void Horse::drawBoundingSpehere(){
-	shader->setFillLoc(1);
-	glm::vec3 body_pos = glm::vec3(-1, body.y / 2 + leg.x * 2 , 0) * scaleMod.x;
-	scale = glm::scale(glm::mat4(1.0f), glm::vec3(5.3, 3, 1.5)); // 5 2 2
+void Horse::drawBoundingCapsule(){
+	if (!collided){
+		shader->setFillLoc(1);
+	}
+	else{
+		shader->setFillLoc(2);
+	}
+
+	//glm::vec3 body_pos = glm::vec3(-1, body.y / 2 + leg.x * 2 , 0) * scaleMod.x;
+	glm::mat4 translateToCenter = glm::translate(glm::mat4(1.0f), glm::vec3(0, 0, -0.5));
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(90.0f), glm::vec3(0, 1, 0));
+	glm::vec3 body_pos = glm::vec3(0, body.y / 2 + leg.x * 2, 0) * scaleMod.x;
+	scale = glm::scale(glm::mat4(1.0f), glm::vec3(3.5, 1.42, 1.42)); // 5 2 2
 	translate = glm::translate(glm::mat4(1.0f), body_pos);
-	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.f), glm::vec3(0, 0, 1));
-	glm::mat4 rotateModMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.x), glm::vec3(1, 0, 0)); //rotate x
-	rotateModMatrix *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.y), glm::vec3(0, 1, 0)); //rotate y
-	rotateModMatrix *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.z), glm::vec3(0, 0, 1)); //rotate z
+	
+	glm::mat4 rotateModMatrixCyl = glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.x), glm::vec3(1, 0, 0)); //rotate x
+	rotateModMatrixCyl *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.y), glm::vec3(0, 1, 0)); //rotate y
+	rotateModMatrixCyl *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.z), glm::vec3(0, 0, 1)); //rotate z
 	scale *= glm::scale(glm::mat4(1.0f), scaleMod);	//scaling modifications
-	glm::mat4 translateModMatrix = glm::translate(glm::mat4(1.0f), translateMod); //translation modification on all 3 axis
-	mm = jointTransformation * translateModMatrix * rotateModMatrix * translate * rotate * scale;
+	glm::mat4 translateModMatrixCyl = glm::translate(glm::mat4(1.0f), translateMod); //translation modification on all 3 axis
+	mm = jointTransformation * translateModMatrixCyl * rotateModMatrixCyl * translate  * scale * rotate * translateToCenter;
 	shader->setMm(mm);
-	GLUquadricObj* sphere = gluNewQuadric();
-	gluSphere(sphere, 1, 16, 16);
+
+	GLUquadricObj* cylinder = gluNewQuadric();
+	gluCylinder(cylinder, 1, 1, 1, 16, 16);
+
+
+
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0, 1, 0));
+	glm::vec3 sphere_pos = glm::vec3(1.75, body.y / 2 + leg.x * 2, 0) * scaleMod.x;
+	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1)); // 5 2 2
+	translate = glm::translate(glm::mat4(1.0f), sphere_pos);
+
+	glm::mat4 rotateModMatrixSphere1 = glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.x), glm::vec3(1, 0, 0)); //rotate x
+	rotateModMatrixSphere1 *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.y), glm::vec3(0, 1, 0)); //rotate y
+	rotateModMatrixSphere1 *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.z), glm::vec3(0, 0, 1)); //rotate z
+	scale *= glm::scale(glm::mat4(1.0f), scaleMod);	//scaling modifications
+	glm::mat4 translateModMatrixSphere1 = glm::translate(glm::mat4(1.0f), translateMod); //translation modification on all 3 axis
+	mm = jointTransformation * translateModMatrixSphere1 * rotateModMatrixSphere1 * translate  * scale * rotate;
+	shader->setMm(mm);
+
+	GLUquadricObj* sphere1 = gluNewQuadric();
+	gluSphere(sphere1, 1.42, 16, 16);
+
+
+	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0, 1, 0));
+	glm::vec3 sphere_pos2 = glm::vec3(-1.75, body.y / 2 + leg.x * 2, 0) * scaleMod.x;
+	scale = glm::scale(glm::mat4(1.0f), glm::vec3(1, 1, 1)); // 5 2 2
+	translate = glm::translate(glm::mat4(1.0f), sphere_pos2);
+
+	glm::mat4 rotateModMatrixSphere = glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.x), glm::vec3(1, 0, 0)); //rotate x
+	rotateModMatrixSphere *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.y), glm::vec3(0, 1, 0)); //rotate y
+	rotateModMatrixSphere *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.z), glm::vec3(0, 0, 1)); //rotate z
+	scale *= glm::scale(glm::mat4(1.0f), scaleMod);	//scaling modifications
+	glm::mat4 translateModMatrixSphere = glm::translate(glm::mat4(1.0f), translateMod); //translation modification on all 3 axis
+	mm = jointTransformation * translateModMatrixSphere * rotateModMatrixSphere * translate  * scale * rotate;
+	shader->setMm(mm);
+
+	GLUquadricObj* sphere2 = gluNewQuadric();
+	gluSphere(sphere2, 1.42, 16, 16);
+
+	Point p1(-1.75 + translateMod.x, body.y / 2 + leg.x * 2 + translateMod.y, 0 + translateMod.z);
+	Point p2(1.75 + translateMod.x, body.y / 2 + leg.x * 2 + translateMod.y, 0 + translateMod.z);
+	bodyCapsule = new Capsule(1.42, p1, p2);
+
 }
 
 void Horse::draw(){
@@ -294,10 +348,8 @@ void Horse::draw(){
 	
 	jointTransformation = glm::mat4(1.0f);
 	drawBody();
-	drawBoundingSpehere();
+	drawBoundingCapsule();
 	
-
-	drawBoundingSpehere();
 	jointTransformation = glm::mat4(1.0f);
 	drawNeck();
 	drawHead();

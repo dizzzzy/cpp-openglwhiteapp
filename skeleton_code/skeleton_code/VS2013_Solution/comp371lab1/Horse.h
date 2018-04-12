@@ -3,16 +3,20 @@
 #include <glm.hpp>
 #include <glew.h>
 #include "Shader.h"
+#include "Capsule.h"
 
 class Horse{
 public:
 	GLuint cubeVAO;
-	Shader* shader;
+	Shader* shader = nullptr;
 	static char mode;
 	glm::mat4 translateBacktoOrigin;
+	bool collided = false;
 
 	//--------CONSTRUCTOR--------
+	Horse();
 	Horse(int);
+	Capsule* bodyCapsule;
 
 
 	//------ MODEL MATRIX ---------
@@ -85,7 +89,7 @@ public:
 	void drawHindLeftLowerLeg();
 	void drawHindRightUpperLeg();
 	void drawHindRightLowerLeg();
-	void drawBoundingSpehere();
+	void drawBoundingCapsule();
 	void init();
 	void draw();
 	void run();

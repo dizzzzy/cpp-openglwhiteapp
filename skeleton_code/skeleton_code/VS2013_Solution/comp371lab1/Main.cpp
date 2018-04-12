@@ -23,6 +23,7 @@
 #include "Lamp.h"
 #include "Horse.h"
 
+
 Shader* shader;
 LightShader* lightShader;
 
@@ -119,7 +120,7 @@ void scrollCallback(GLFWwindow* window, double xOffset, double yOffset){
 	std::cout << xOffset << " : " << yOffset << std::endl;
 	glm::vec3 zoom;
 	//c_dir = glm::normalize(center - c_pos);
-	zoom = c_dir * 0.25f;
+	zoom = c_dir * 1.0f;
 	if (yOffset > 0){ //zoom in
 		c_pos += zoom;
 		update_view();
@@ -168,7 +169,7 @@ static void cursorPositionCallback(GLFWwindow* window, double xPos, double yPos)
 		//c_dir = glm::normalize(center - c_pos);
 		double yDelta = cursorYPos - yPos;
 		cursorYPos = yPos;
-		zoom = c_dir * 0.25f;
+		zoom = c_dir * 0.5f;
 		if (yDelta > 0){ //zoom in
 			c_pos -= zoom;
 			update_view();
@@ -567,15 +568,32 @@ int main() {
 			for (int i = 0; i < horses.size(); i++){
 				horses.at(i)->draw();
 			}
+			//horse.draw();
 			shader->UnbindTexture();
 
 		}
 		else{
 			shader->setX(0);
 			grid.draw(shader);
+			for (int i = 0; i < horses.size()-1; i++){
+				for (int j = i +1; j < horses.size(); j++){
+					if (!(horses.at(i)->bodyCapsule == nullptr || horses.at(j)->bodyCapsule == nullptr)){
+						bool intersected = Capsule::intersect(*(horses.at(i)->bodyCapsule), *(horses.at(j)->bodyCapsule));
+						if (intersected){
+							horses.at(i)->collided = true;
+							horses.at(j)->collided = true;
+						}
+						/*else{
+							horses.at(i)->collided = false;
+							horses.at(j)->collided = false;
+						}*/
+					}
+				}
+			}
 			for (int i = 0; i < horses.size(); i++){
 				horses.at(i)->draw();
 			}
+			//horse.draw();
 		}
 
 		axes.draw(shader);
