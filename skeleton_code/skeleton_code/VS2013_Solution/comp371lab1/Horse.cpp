@@ -11,10 +11,10 @@ Horse::Horse(){
 
 Horse::Horse(int i){
 	srand((i*8)^2);
-	int random = rand() % 50 + (-50);
+	int random = rand() % 90 + (-45);
 	translateMod.z = random;
 	srand(rand()+ i*8);
-	int rand2 = rand() % 50 + (-50);
+	int rand2 = rand() % 90 + (-45);
 	translateMod.x = rand2;
 	srand(rand() + i * 32);
 	int randRot = rand() % 360;
@@ -343,6 +343,11 @@ void Horse::drawBoundingCapsule(){
 	Point p1(pTransformed1.x, pTransformed1.y, pTransformed1.z);
 	Point p2(pTransformed2.x, pTransformed2.y, pTransformed2.z);
 	bodyCapsule = new Capsule(1.42, p1, p2);
+	//p2 is the front of the horse
+	//p1 is the back of the horse
+	glm::vec3 dir(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z);
+	dir.y = 0;
+	this->normDir = new glm::vec3(glm::normalize(dir));
 
 }
 
@@ -455,8 +460,11 @@ void Horse::init(){
 void Horse::move(){
 	if (hasntRotated){
 		if (movementLimit < reachedLimit){
-			movementLimit += 0.1;
-			translateMod.z += 0.1;
+			if (this->normDir != nullptr){
+				movementLimit += 0.1;
+				translateMod.z += 0.1 * this->normDir->z;
+				translateMod.x += 0.1 * this->normDir->x;
+			}	
 		}
 		else{
 			movementLimit = 0;
@@ -471,8 +479,14 @@ void Horse::move(){
 		}
 		else{
 			rotateMod.y -= 15;
-		}
-		
+		}	
 	}
-	
+}
+
+void Horse::stop(){
+
+}
+
+void Horse::unstuckRotate(){
+	rotateMod.y += 180;
 }

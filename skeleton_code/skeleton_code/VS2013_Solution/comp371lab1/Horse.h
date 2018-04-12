@@ -15,6 +15,9 @@ public:
 	float reachedLimit;
 	float movementLimit; 
 	bool hasntRotated;
+	int inc;
+	bool unstuck = false;
+	glm::vec3* normDir = nullptr;
 
 	//--------CONSTRUCTOR--------
 	Horse();
@@ -98,5 +101,7 @@ public:
 	void run();
 	void walk();
 	void move();
+	void stop();
+	void unstuckRotate();
 };
 #endif
