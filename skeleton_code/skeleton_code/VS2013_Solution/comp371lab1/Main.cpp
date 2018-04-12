@@ -580,13 +580,14 @@ int main() {
 					if (!(horses.at(i)->bodyCapsule == nullptr || horses.at(j)->bodyCapsule == nullptr)){
 						bool intersected = Capsule::intersect(*(horses.at(i)->bodyCapsule), *(horses.at(j)->bodyCapsule));
 						if (intersected){
-							horses.at(i)->collided = true;
-							horses.at(j)->collided = true;
+								horses.at(i)->collided = true;
+								horses.at(j)->collided = true;
 						}
 					}
 				}
 			}
 			for (int i = 0; i < horses.size(); i++){
+				horses.at(i)->move();
 				horses.at(i)->draw();
 				//reset collision 
 				horses.at(i)->collided = false;

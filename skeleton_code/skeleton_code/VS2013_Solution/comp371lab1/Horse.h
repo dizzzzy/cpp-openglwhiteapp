@@ -12,6 +12,9 @@ public:
 	static char mode;
 	glm::mat4 translateBacktoOrigin;
 	bool collided = false;
+	float reachedLimit;
+	float movementLimit; 
+	bool hasntRotated;
 
 	//--------CONSTRUCTOR--------
 	Horse();
@@ -94,6 +97,6 @@ public:
 	void draw();
 	void run();
 	void walk();
-
+	void move();
 };
 #endif

@@ -11,12 +11,14 @@ Horse::Horse(){
 
 Horse::Horse(int i){
 	srand((i*8)^2);
-	//srand(time(NULL));
-	int random = rand() % 100 + (-49);
+	int random = rand() % 50 + (-50);
 	translateMod.z = random;
 	srand(rand()+ i*8);
-	int rand2 = rand() % 100 + (-49);
+	int rand2 = rand() % 50 + (-50);
 	translateMod.x = rand2;
+	srand(rand() + i * 32);
+	int randRot = rand() % 360;
+	rotateMod.y = randRot;
 }
 
 void Horse::drawObj(int vertexNum){
@@ -308,12 +310,14 @@ void Horse::drawBoundingCapsule(){
 	rotateModMatrixSphere1 *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.z), glm::vec3(0, 0, 1)); //rotate z
 	scale *= glm::scale(glm::mat4(1.0f), scaleMod);	//scaling modifications
 	glm::mat4 translateModMatrixSphere1 = glm::translate(glm::mat4(1.0f), translateMod); //translation modification on all 3 axis
-	mm = jointTransformation * translateModMatrixSphere1 * rotateModMatrixSphere1 * translate  * scale * rotate;
+	mm = jointTransformation * translateModMatrixSphere1 * rotateModMatrixSphere1 * translate  * rotate * scale;
 	shader->setMm(mm);
 
 	GLUquadricObj* sphere1 = gluNewQuadric();
 	gluSphere(sphere1, 1.42, 16, 16);
 
+	glm::vec4 pTransformed1(0, 0, 0, 1); //-1.75 + translateMod.x, body.y / 2 + leg.x * 2 + translateMod.y, 0 + translateMod.z,
+	pTransformed1 = mm  * pTransformed1;
 
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0, 1, 0));
 	glm::vec3 sphere_pos2 = glm::vec3(-1.75, body.y / 2 + leg.x * 2, 0) * scaleMod.x;
@@ -325,14 +329,19 @@ void Horse::drawBoundingCapsule(){
 	rotateModMatrixSphere *= glm::rotate(glm::mat4(1.0f), glm::radians(rotateMod.z), glm::vec3(0, 0, 1)); //rotate z
 	scale *= glm::scale(glm::mat4(1.0f), scaleMod);	//scaling modifications
 	glm::mat4 translateModMatrixSphere = glm::translate(glm::mat4(1.0f), translateMod); //translation modification on all 3 axis
-	mm = jointTransformation * translateModMatrixSphere * rotateModMatrixSphere * translate  * scale * rotate;
+	mm = jointTransformation * translateModMatrixSphere * rotateModMatrixSphere * translate  * rotate * scale;
 	shader->setMm(mm);
 
 	GLUquadricObj* sphere2 = gluNewQuadric();
 	gluSphere(sphere2, 1.42, 16, 16);
 
-	Point p1(-1.75 + translateMod.x, body.y / 2 + leg.x * 2 + translateMod.y, 0 + translateMod.z);
-	Point p2(1.75 + translateMod.x, body.y / 2 + leg.x * 2 + translateMod.y, 0 + translateMod.z);
+	//glm::vec4 pTransformed1(-1.75, body.y / 2 + leg.x * 2, 0, 1); //-1.75 + translateMod.x, body.y / 2 + leg.x * 2 + translateMod.y, 0 + translateMod.z,
+	//pTransformed1 = mm  * pTransformed1;
+
+	glm::vec4 pTransformed2(0, 0, 0, 1);
+	pTransformed2 = mm * pTransformed2;
+	Point p1(pTransformed1.x, pTransformed1.y, pTransformed1.z);
+	Point p2(pTransformed2.x, pTransformed2.y, pTransformed2.z);
 	bodyCapsule = new Capsule(1.42, p1, p2);
 
 }
@@ -441,4 +450,29 @@ void Horse::init(){
 	glBindBuffer(GL_ARRAY_BUFFER, 0); // Note that this is allowed, the call to glVertexAttribPointer registered VBO as the currently bound vertex buffer object so afterwards we can safely unbind
 
 	glBindVertexArray(0); // Unbind VAO (it's always a good thing to unbind any buffer/array to prevent strange bugs), remember: do NOT unbind the EBO, keep it bound to this VAO
+}
+
+void Horse::move(){
+	if (hasntRotated){
+		if (movementLimit < reachedLimit){
+			movementLimit += 0.1;
+			translateMod.z += 0.1;
+		}
+		else{
+			movementLimit = 0;
+			hasntRotated = false;
+		}
+	}
+	else{
+		hasntRotated = true;
+		reachedLimit = rand() % 10 + 5;
+		if ((rand() % 2)){
+			rotateMod.y -= 15;
+		}
+		else{
+			rotateMod.y -= 15;
+		}
+		
+	}
+	
 }
