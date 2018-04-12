@@ -28,7 +28,7 @@ Shader* shader;
 LightShader* lightShader;
 
 GLFWwindow* window;
-
+std::vector<Horse*> horses;
 
 
 glm::vec3 lightColor(1.0);
@@ -402,6 +402,11 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			rotateMod.y -= 5;
 		}
 	}
+	
+	if (key == GLFW_KEY_O){
+		int random = rand() % 20;
+		horses.at(random)->stop();
+	}
 
 	if (key == GLFW_KEY_T && action == GLFW_PRESS) {
 		Horse::mode = 'T';
@@ -506,7 +511,7 @@ int main() {
 	Axes axes;
 	Lamp lamp;
 	//Horse horse;
-	std::vector<Horse*> horses;
+
 	for (int i = 0; i < 20; i++){
 		Horse* horse = new Horse(i);
 		horses.push_back(horse);
@@ -565,8 +570,100 @@ int main() {
 
 
 			shader->activateTexture0();
-			for (int i = 0; i < horses.size(); i++){
+			/*for (int i = 0; i < horses.size(); i++){
 				horses.at(i)->draw();
+			}*/
+			for (int i = 0; i < horses.size(); i++){
+				bool bottom;
+				bool top;
+				bool left;
+				bool right;
+				bool inverseX;
+				bool inverseZ;
+
+				//check Boundary Walls
+				if (horses.at(i)->bodyCapsule != nullptr){
+					Capsule cap3 = *(horses.at(i)->bodyCapsule);
+					if ((cap3.segment->P0.z + cap3.radius > 50) || (cap3.segment->P1.z + cap3.radius > 50)){
+						bottom = true;
+						horses.at(i)->collided = true;
+						inverseZ = true;
+					}
+					else{
+						bottom = false;
+						inverseZ = false;
+					}
+					if ((cap3.segment->P0.z - cap3.radius < -50) || cap3.segment->P1.z - cap3.radius < -50){
+						top = true;
+						horses.at(i)->collided = true;
+						inverseZ = true;
+					}
+					else{
+						top = false;
+						inverseZ = false;
+					}
+					if ((cap3.segment->P0.x + cap3.radius > 50) || (cap3.segment->P1.x + cap3.radius > 50)){
+						right = true;
+						horses.at(i)->collided = true;
+						inverseX = true;
+					}
+					else{
+						right = false;
+						inverseX = false;
+					}
+					if ((cap3.segment->P0.x - cap3.radius < -50) || (cap3.segment->P1.x - cap3.radius < -50)){
+						left = true;
+						horses.at(i)->collided = true;
+						inverseX = true;
+					}
+					else{
+						left = false;
+						inverseX = false;
+					}
+				}
+
+				if (i != horses.size() - 1){
+					//check if collision with other horses
+					for (int j = i + 1; j < horses.size(); j++){
+						if (!(horses.at(i)->bodyCapsule == nullptr || horses.at(j)->bodyCapsule == nullptr)){
+							bool intersected = Capsule::intersect(*(horses.at(i)->bodyCapsule), *(horses.at(j)->bodyCapsule));
+
+
+							if (intersected){
+								horses.at(i)->collided = true;
+								horses.at(j)->collided = true;
+							}
+						}
+					}
+				}
+
+			}
+			for (int i = 0; i < horses.size(); i++){
+				if (!horse.at(i)->stopped){
+					if (horses.at(i)->collided == true && horses.at(i)->unstuck == false){
+						//I should stop and redirect back 
+						//horses.at(i)->stop();
+						horses.at(i)->unstuckRotate();
+						horses.at(i)->unstuck = true;
+						horses.at(i)->draw();
+						horses.at(i)->inc = 0;
+					}
+					else{
+						horses.at(i)->move();
+						horses.at(i)->draw();
+
+						if (horses.at(i)->inc != 10){
+							horses.at(i)->inc++;
+							if (horses.at(i)->inc == 10){
+								horses.at(i)->unstuck = false;
+							}
+						}
+
+					}
+				}
+
+				//reset collision 
+				horses.at(i)->collided = false;
 			}
 			//horse.draw();
 			shader->UnbindTexture();

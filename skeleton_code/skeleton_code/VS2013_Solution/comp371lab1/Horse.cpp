@@ -296,8 +296,9 @@ void Horse::drawBoundingCapsule(){
 	shader->setMm(mm);
 
 	GLUquadricObj* cylinder = gluNewQuadric();
-	gluCylinder(cylinder, 1, 1, 1, 16, 16);
-
+	if (!this->shader->shader_x_pressed){
+		gluCylinder(cylinder, 1, 1, 1, 16, 16);
+	}
 
 
 	rotate = glm::rotate(glm::mat4(1.0f), glm::radians(0.0f), glm::vec3(0, 1, 0));
@@ -314,7 +315,9 @@ void Horse::drawBoundingCapsule(){
 	shader->setMm(mm);
 
 	GLUquadricObj* sphere1 = gluNewQuadric();
-	gluSphere(sphere1, 1.42, 16, 16);
+	if (!this->shader->shader_x_pressed){
+		gluSphere(sphere1, 1.42, 16, 16);
+	}
 
 	glm::vec4 pTransformed1(0, 0, 0, 1); //-1.75 + translateMod.x, body.y / 2 + leg.x * 2 + translateMod.y, 0 + translateMod.z,
 	pTransformed1 = mm  * pTransformed1;
@@ -333,7 +336,10 @@ void Horse::drawBoundingCapsule(){
 	shader->setMm(mm);
 
 	GLUquadricObj* sphere2 = gluNewQuadric();
-	gluSphere(sphere2, 1.42, 16, 16);
+	if (!this->shader->shader_x_pressed){
+		gluSphere(sphere2, 1.42, 16, 16);
+	}
+	
 
 	//glm::vec4 pTransformed1(-1.75, body.y / 2 + leg.x * 2, 0, 1); //-1.75 + translateMod.x, body.y / 2 + leg.x * 2 + translateMod.y, 0 + translateMod.z,
 	//pTransformed1 = mm  * pTransformed1;

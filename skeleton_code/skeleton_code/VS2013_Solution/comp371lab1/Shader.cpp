@@ -122,6 +122,7 @@ void Shader::setPm(const glm::mat4 & pm){
 void Shader::setX(int x_pressed){
 	this->use();
 	glUniform1i(glGetUniformLocation(this->shdr, "shader_x_pressed"), x_pressed);
+	this->shader_x_pressed = x_pressed;
 }
 
 void Shader::setFillLoc(int fill){

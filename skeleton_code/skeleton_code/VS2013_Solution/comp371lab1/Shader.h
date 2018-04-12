@@ -18,13 +18,14 @@ private:
 	GLuint texture0;
 	GLuint texture1;
 	//GLuint fillLoc;
-	/*GLuint shader_x_pressed;
-	glm::vec3 lightColor;
+	
+	/*glm::vec3 lightColor;
 	glm::vec3 lightPos;
 	glm::vec3 viewPos;*/
 
 public:
 	GLuint shdr; //ShaderID
+	int shader_x_pressed;
 	Shader(std::string vShader, std::string fShader);
 	void use();
 	void setMm(const glm::mat4&);
